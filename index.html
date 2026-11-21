@@ -310,6 +310,119 @@ footer p+p{margin-top:8px}
   .cmp{font-size:14px}.cmp th,.cmp td{padding:12px 9px}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ===================== v4 · lapidação Vice City ===================== */
+:root{
+  --night:#140a24;--night2:#1b0f30;--card:rgba(33,17,56,.78);--line:rgba(255,214,232,.12);
+  --pink:#ff2d7a;--orange:#ff8a3d;--aqua:#22d3c5;--pastel:#ffd6e8;--sand:#ffe2b8;
+  --sunset:linear-gradient(92deg,#ff2d7a 0%,#ff5a5f 45%,#ff8a3d 100%);
+  --cta:linear-gradient(180deg,#ff5294 0%,#ff2d7a 52%,#e5135c 100%);
+}
+body{background:var(--night)}
+body:after{content:"";position:fixed;inset:0;pointer-events:none;z-index:95;opacity:.07;mix-blend-mode:overlay;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.wrap{padding:0 22px}
+section{padding:76px 0}
+h1{font-size:clamp(46px,12.4vw,96px);line-height:.95;letter-spacing:.2px}
+h2{font-size:clamp(34px,9vw,58px);line-height:.98;margin-bottom:16px}
+.lead{font-size:clamp(17.5px,4.5vw,20px);line-height:1.5;color:#f3e9f5}
+.mut{color:#cdbfdc}
+.sun{background:var(--sunset);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+/* letreiro de neon: o elemento-assinatura da página */
+.script,.script.sun{font-family:Yellowtail,cursive;background:none;-webkit-text-fill-color:#ffe3ef;color:#ffe3ef;text-transform:none;letter-spacing:0;
+  text-shadow:0 0 2px #fff,0 0 8px #ff2d7a,0 0 18px #ff2d7a,0 0 38px rgba(255,45,122,.75),0 0 70px rgba(255,45,122,.45)}
+.neon{font-family:Yellowtail,cursive;font-weight:400;text-transform:none;font-size:1.05em;color:#d9fffb;-webkit-text-fill-color:#d9fffb;background:none;
+  text-shadow:0 0 2px #fff,0 0 8px #22d3c5,0 0 20px #22d3c5,0 0 44px rgba(34,211,197,.6);letter-spacing:0}
+@keyframes flick{0%,92%,100%{opacity:1}93%{opacity:.55}95%{opacity:1}97%{opacity:.7}}
+.hero .script{animation:flick 6s infinite}
+
+/* rótulos discretos, sem caixa alta */
+.eyebrow{font-size:14px;font-weight:700;letter-spacing:.2px;text-transform:none;color:var(--aqua);margin-bottom:12px}
+.eyebrow:before{width:18px;height:2px;background:var(--aqua);box-shadow:0 0 8px var(--aqua)}
+.center .eyebrow{justify-content:flex-start}
+
+/* alinhamento: tudo à esquerda; só planos, garantia e fechamento centralizados */
+.center{text-align:left}
+#planos .center,.final .center,.final.center{text-align:center}
+#planos .center .eyebrow,.final .eyebrow{justify-content:center}
+.final .roads{text-align:left}
+
+/* HERO com cor de verdade */
+.hero{min-height:calc(100svh - 38px);padding:96px 0 34px;align-items:flex-end}
+.hero .photo img{filter:saturate(1.45) contrast(1.08) brightness(1.08);object-position:58% 30%;animation:none;transform:none}
+.hero .photo:before{content:"";position:absolute;inset:0;z-index:1;mix-blend-mode:soft-light;background:linear-gradient(195deg,rgba(255,138,61,.85) 0%,rgba(255,45,122,.7) 38%,rgba(120,60,255,.35) 70%,transparent 100%)}
+.hero .photo:after{z-index:2;background:linear-gradient(180deg,rgba(20,10,36,0) 0%,rgba(20,10,36,0) 30%,rgba(20,10,36,.55) 50%,rgba(20,10,36,.92) 70%,var(--night) 100%)}
+.hero .on-photo{z-index:3}
+.tag-live{background:rgba(20,10,36,.55);border-color:rgba(255,214,232,.28);letter-spacing:.3px;text-transform:none;font-size:13px;font-weight:700}
+.hero h1{margin-bottom:14px;text-shadow:0 2px 24px rgba(20,10,36,.55)}
+.hero h1 .script{font-size:.66em;margin-top:10px;line-height:1.05}
+.hero .lead{margin-bottom:20px;text-shadow:0 1px 10px rgba(20,10,36,.8)}
+.price-flash{margin:0 0 14px;gap:12px;align-items:center}
+.price-flash .p{font-size:46px;color:#fff;-webkit-text-fill-color:#fff;background:none;text-shadow:0 0 18px rgba(255,45,122,.6)}
+.price-flash s{font-size:15px}
+.hero .btn{max-width:none}
+.hero .trust{justify-content:flex-start;gap:6px 14px}
+
+/* BOTÃO: sólido, branco sobre rosa neon, altura fixa */
+.btn{background:var(--cta);color:#fff;font-size:17px;font-weight:900;letter-spacing:.6px;line-height:1.15;
+  min-height:64px;padding:12px 22px;border-radius:14px;border:1px solid rgba(255,255,255,.28);
+  box-shadow:0 0 0 4px rgba(255,45,122,.16),0 14px 34px -10px rgba(255,45,122,.85),inset 0 1px 0 rgba(255,255,255,.35);
+  text-shadow:0 1px 1px rgba(120,0,40,.35);max-width:520px;width:100%}
+.btn small{font-size:12.5px;font-weight:600;letter-spacing:.1px;color:rgba(255,255,255,.88);text-shadow:none}
+.btn:after{background:linear-gradient(100deg,transparent,rgba(255,255,255,.35),transparent);animation-duration:4.5s}
+.btn:hover{box-shadow:0 0 0 5px rgba(255,45,122,.22),0 18px 44px -10px rgba(255,45,122,1),inset 0 1px 0 rgba(255,255,255,.35)}
+.btn:focus-visible{outline:3px solid var(--aqua);outline-offset:3px}
+.btn-dark{background:rgba(255,255,255,.06);color:#fff;border:1px solid rgba(255,214,232,.22);box-shadow:none;text-shadow:none}
+.trust{color:#d8cbe6}
+.trust span:before{color:var(--aqua)}
+
+/* faixa */
+.ticker{background:linear-gradient(90deg,#ff2d7a,#ff8a3d);border:0;padding:12px 0}
+.ticker span{color:#2a0a1c;font-size:17px}
+.ticker span i{color:#fff}
+
+/* cartões com hierarquia */
+.card{border-radius:18px;border-color:var(--line);border-top-color:rgba(255,214,232,.2)}
+.qb .card{text-align:left;padding:16px}
+.qb .i{font-size:24px}
+.stat .n{color:#fff}
+.money .ic{background:rgba(34,211,197,.12);border-color:rgba(34,211,197,.35)}
+.item.hl .ic{background:var(--cta)}
+.pill{background:var(--aqua);color:#06221f}
+.tl.new{border-color:rgba(255,45,122,.6);background:linear-gradient(160deg,rgba(255,45,122,.22),var(--card) 70%)}
+.quote{border-left-color:var(--aqua)}
+.answer{background:linear-gradient(135deg,rgba(34,211,197,.16),rgba(34,211,197,.05));border-color:rgba(34,211,197,.45)}
+.sec-photo .photo img{filter:saturate(1.3)}
+.sec-photo .photo:after{background:linear-gradient(180deg,var(--night) 0%,rgba(20,10,36,.78) 16%,rgba(20,10,36,.78) 84%,var(--night) 100%)}
+
+/* categorias com foto */
+.cat{min-height:96px;display:flex;flex-direction:column;justify-content:flex-end;padding:12px;background:linear-gradient(180deg,rgba(20,10,36,.1),rgba(20,10,36,.85)),var(--img) center/cover;border:1px solid var(--line)}
+.cat b{color:#fff;-webkit-text-fill-color:#fff;background:none;font-size:26px}
+.cat span{color:#f3e9f5}
+
+/* planos */
+.plan{border-radius:22px;padding:26px 22px}
+.plan.pro{background:linear-gradient(rgba(33,17,56,.97),rgba(33,17,56,.97)) padding-box,var(--sunset) border-box}
+.badge{background:var(--aqua);color:#06221f}
+.price.sun{color:#fff;-webkit-text-fill-color:#fff;background:none;text-shadow:0 0 22px rgba(255,45,122,.55)}
+.feat li:before{color:var(--aqua)}
+.seal{border-color:var(--pink);box-shadow:inset 0 0 0 7px var(--night),inset 0 0 0 8.5px rgba(255,45,122,.5),0 0 40px rgba(255,45,122,.3)}
+.who.y li:before{color:var(--aqua)}
+summary:after{color:var(--aqua)}
+
+/* sem animação de entrada em cada seção */
+.reveal{opacity:1;transform:none;transition:none}
+
+.sticky{background:rgba(20,10,36,.95)}
+.sticky .btn{min-height:52px;padding:8px 16px;font-size:15px}
+.sticky .p b{color:#fff;-webkit-text-fill-color:#fff;background:none}
+
+@media (max-width:860px){
+  section{padding:60px 0}
+  .hero{padding-top:84px}
+  .btn{max-width:none}
+  .money{padding:14px 16px}
+}
 </style>
 </head>
 <body>
@@ -320,11 +433,11 @@ footer p+p{margin-top:8px}
 <header class="hero">
   <div class="photo"><img src="https://images.unsplash.com/photo-1533106497176-45ae19e68ba2?w=1100&q=70&auto=format&fit=crop" alt="Avenida à beira-mar à noite com prédios em neon rosa e palmeiras" fetchpriority="high"></div>
   <div class="wrap on-photo">
-    <div class="tag-live"><span class="dot"></span>GTA 6 saiu dia 19 · a corrida começou</div>
+    <div class="tag-live"><span class="dot"></span>GTA 6 saiu dia 19. A corrida começou.</div>
     <h1>Em 2013 você viu os outros crescerem com GTA&nbsp;V.<span class="script sun">Agora é a sua vez.</span></h1>
-    <p class="lead">Seu canal de GTA 6 no ar <b>hoje</b>, postando todo dia: <b>2.122 vídeos prontos</b>, conteúdo novo toda semana e um roteiro que <b>só você tem</b>. Sem gravar, sem editar, sem aparecer.</p>
+    <p class="lead"><b>2.122 vídeos prontos</b>, lote novo toda semana e um roteiro que <b>só você tem</b>. Seu canal de GTA 6 no ar hoje, sem gravar, editar ou aparecer.</p>
     <div class="price-flash"><s>R$ 383</s><span class="p sun">R$ 19,90</span><span class="u">pagamento<br>único</span></div>
-    <a href="#planos" class="btn">Quero meu canal agora →<small>Acesso liberado em segundos no PIX</small></a>
+    <a href="#planos" class="btn">Quero meu canal agora<small>R$ 19,90 · acesso em segundos no PIX</small></a>
     <div class="trust"><span>Acesso imediato</span><span>Garantia de 7 dias</span><span>Sem mensalidade</span></div>
   </div>
 </header>
@@ -457,7 +570,7 @@ footer p+p{margin-top:8px}
   <div class="wrap on-photo">
     <div class="narrow center reveal">
       <span class="eyebrow">A solução</span>
-      <h2>Sistema <span class="sun">Recarga</span></h2>
+      <h2>Sistema <span class="neon">Recarga</span></h2>
       <p class="lead">Três camadas que transformam um pack parado num canal que nunca fica sem conteúdo e nunca posta o mesmo que os outros.</p>
     </div>
     <div class="steps">
@@ -473,7 +586,7 @@ footer p+p{margin-top:8px}
   <div class="wrap narrow">
     <div class="reveal">
       <span class="eyebrow">Sem comparação</span>
-      <h2>Pack comum x <span class="sun">Canal Vice City</span></h2>
+      <h2>Pack comum x <span class="script">Vice City</span></h2>
       <table class="cmp">
         <tr><th></th><th style="text-align:center">Pack comum</th><th class="us" style="text-align:center">Vice City</th></tr>
         <tr><td>Vídeos prontos</td><td class="no"><span class="y1">✓</span></td><td class="us">2.122</td></tr>
@@ -512,7 +625,7 @@ footer p+p{margin-top:8px}
       <div class="card item reveal"><div class="ic">💬</div><div><h3>Comunidade + suporte no WhatsApp</h3><p>Tira dúvida e vê o que está funcionando para os outros membros.</p></div><span class="val">R$ 27</span></div>
     </div>
     <div class="total reveal"><span class="o">De R$ 383</span><span>por apenas <span class="nw sun">R$ 19,90</span></span></div>
-    <div style="margin-top:22px" class="reveal"><a href="#planos" class="btn">Quero tudo isso por R$ 19,90 →</a></div>
+    <div style="margin-top:22px" class="reveal"><a href="#planos" class="btn">Quero tudo por R$ 19,90</a></div>
   </div>
 </section>
 
@@ -525,14 +638,14 @@ footer p+p{margin-top:8px}
         <h2>Abriu. Baixou. <span class="sun">Postou.</span></h2>
         <p class="lead">Tudo fica numa área que funciona como aplicativo no seu celular. Você abre o roteiro do dia, baixa o vídeo, copia as tags e marca como publicado. Menos de 5 minutos por post.</p>
         <div class="cats">
-          <div class="card cat"><b class="sun">1.544</b><span>gerais</span></div>
-          <div class="card cat"><b class="sun">159</b><span>cortes</span></div>
-          <div class="card cat"><b class="sun">122+</b><span>novos da semana</span></div>
-          <div class="card cat"><b class="sun">84</b><span>vídeos de GTA</span></div>
-          <div class="card cat"><b class="sun">43</b><span>memes</span></div>
-          <div class="card cat"><b class="sun">23</b><span>clipes</span></div>
-          <div class="card cat"><b class="sun">14</b><span>curiosidades</span></div>
-          <div class="card cat"><b class="sun">411</b><span>imagens</span></div>
+          <div class="card cat" style="--img:url(https://images.unsplash.com/photo-1779333429848-d6494e6b11ff?w=300&q=50&auto=format&fit=crop)"><b class="sun">1.544</b><span>gerais</span></div>
+          <div class="card cat" style="--img:url(https://images.unsplash.com/photo-1593810659067-3abb9b4dfa4c?w=300&q=50&auto=format&fit=crop)"><b class="sun">159</b><span>cortes</span></div>
+          <div class="card cat" style="--img:url(https://images.unsplash.com/photo-1606022831434-91293aebf25a?w=300&q=50&auto=format&fit=crop)"><b class="sun">122+</b><span>novos da semana</span></div>
+          <div class="card cat" style="--img:url(https://images.unsplash.com/photo-1617170709038-edc4e2641aaf?w=300&q=50&auto=format&fit=crop)"><b class="sun">84</b><span>vídeos de GTA</span></div>
+          <div class="card cat" style="--img:url(https://images.unsplash.com/photo-1557176529-ca2474ad7495?w=300&q=50&auto=format&fit=crop)"><b class="sun">43</b><span>memes</span></div>
+          <div class="card cat" style="--img:url(https://images.unsplash.com/photo-1608095476825-d4e0f916372f?w=300&q=50&auto=format&fit=crop)"><b class="sun">23</b><span>clipes</span></div>
+          <div class="card cat" style="--img:url(https://images.unsplash.com/photo-1623424455593-da762bf80815?w=300&q=50&auto=format&fit=crop)"><b class="sun">14</b><span>curiosidades</span></div>
+          <div class="card cat" style="--img:url(https://images.unsplash.com/photo-1652112428671-fceb3e666710?w=300&q=50&auto=format&fit=crop)"><b class="sun">411</b><span>imagens</span></div>
         </div>
       </div>
       <div class="mock reveal" aria-label="Exemplo ilustrativo da área de membros">
@@ -617,7 +730,7 @@ footer p+p{margin-top:8px}
           <li>Comunidade + suporte no WhatsApp</li>
           <li><b>Bônus:</b> Robô de Cortes (8º dia)</li>
         </ul>
-        <a href="#CHECKOUT_COMPLETO" class="btn">Quero o Canal Completo →<small>Por R$ 10 a mais: 3x mais vídeos + recarga toda semana</small></a>
+        <a href="#CHECKOUT_COMPLETO" class="btn">Quero o Canal Completo<small>3x mais vídeos + recarga toda semana</small></a>
       </div>
     </div>
     <div class="secure"><span>🔒 Compra segura</span><span>⚡ PIX libera na hora</span><span>💳 Cartão</span><span>🛡️ Garantia de 7 dias</span></div>
@@ -696,7 +809,7 @@ footer p+p{margin-top:8px}
         <div class="card road bad"><h3>❌ Esperar</h3><p>Ver outros perfis crescendo com GTA 6 enquanto o hype passa. De novo, como em 2013.</p></div>
         <div class="card road good"><h3>✅ Começar hoje</h3><p>Canal no ar hoje, 3 vídeos por dia, conteúdo novo toda semana e um roteiro que é só seu.</p></div>
       </div>
-      <a href="#planos" class="btn">Quero meu canal por R$ 19,90 →<small>Preço de lançamento até 30/11</small></a>
+      <a href="#planos" class="btn">Quero meu canal por R$ 19,90<small>Preço de lançamento até 30/11</small></a>
       <div class="trust"><span>Acesso imediato</span><span>Garantia dupla</span><span>Pagamento único</span></div>
     </div>
   </div>
@@ -714,7 +827,7 @@ footer p+p{margin-top:8px}
 
 <div class="sticky" id="sticky">
   <div class="p">Canal Completo<b class="sun">R$ 19,90</b></div>
-  <a href="#planos" class="btn">Quero agora →</a>
+  <a href="#planos" class="btn">Quero agora</a>
 </div>
 
 <script>
