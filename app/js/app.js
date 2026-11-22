@@ -195,7 +195,8 @@ const NAV = [
   ['Extras', [
     ['extra/capas', 'Kit Capas', 'tag', 'capas'],
     ['extra/carrossel', 'Pack Carrossel', 'note', 'carrossel'],
-    ['extra/piloto', 'Piloto Automático', 'play', 'piloto_lite']
+    ['extra/piloto', 'Piloto Automático', 'play', 'piloto_lite'],
+    ['estudio', 'Estúdio Vice', 'wand', 'piloto_lite']
   ]]
 ];
 function shell() {
@@ -749,7 +750,7 @@ function agShow(ag) {
   const mes = new Date(ag.days[0].iso + 'T12:00:00').toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
   out.innerHTML = `
   <div class="sec-h sec"><div><h2 class="h2">Seus 30 dias</h2><p>${fmt(total)} posts · ${fmt(vids)} vídeos diferentes · a partir de ${mes}</p></div>
-    <div class="row"><a class="btn btn-p btn-s" href="#/hoje">${ic('clock')}Ver o que postar hoje</a><button class="btn btn-g btn-s" id="agre">${ic('refresh')}Gerar de novo</button><button class="btn btn-g btn-s" id="agics">${ic('cal')}Adicionar ao Google Agenda</button><button class="btn btn-g btn-s" id="agcsv">${ic('note')}Planilha</button></div></div>
+    <div class="row"><a class="btn btn-p btn-s" href="#/hoje">${ic('clock')}Ver o que postar hoje</a><button class="btn btn-g btn-s" id="agre">${ic('refresh')}Gerar de novo</button><button class="btn btn-g btn-s" id="agics">${ic('cal')}Adicionar ao Google Agenda</button><button class="btn btn-g btn-s" id="agcsv">${ic('note')}Planilha</button><button class="btn btn-p btn-s" id="agauto">${ic('bolt')}Postar sozinho</button></div></div>
   <div class="card rv"><div class="row"><div class="legend">${plats.map(p => `<span><i style="background:${C.plats[p].cor}"></i>${C.plats[p].nome}</span>`).join('')}</div><span class="sp"></span><span class="dim" style="font-size:13px;font-weight:700">${agendaProgresso(ag)}% concluído</span></div>
     <div class="prog" style="margin:12px 0 16px"><i style="width:${agendaProgresso(ag)}%"></i></div>
     <div class="cal">${['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map(d => `<div class="wd">${d}</div>`).join('')}${'<div></div>'.repeat(first)}${ag.days.map((d, i) => { const dt = new Date(d.iso + 'T12:00:00'); const okc = d.posts.filter(p => ok[agKey(p)]).length; return `<button class="day ${d.off ? 'off' : ''} ${d.iso === today ? 'today' : ''}" data-day="${i}"><span class="dn">${dt.getDate()}${d.posts.length ? `<small>${okc}/${d.posts.length}</small>` : ''}</span>${d.posts.slice(0, 4).map(p => `<span class="slot ${ok[agKey(p)] ? 'ok' : ''}"><i style="background:${C.plats[p.p].cor}"></i>${p.h}</span>`).join('')}${d.posts.length > 4 ? `<span class="dim" style="font-size:11px;font-weight:700">+${d.posts.length - 4}</span>` : ''}</button>`; }).join('')}</div>
@@ -768,6 +769,7 @@ function agShow(ag) {
     if (b.id === 'agre') { const cfg = { ...ag.cfg, seed: (Math.random() * 1e9) >>> 0 }; const n = agGerar(cfg); save('agenda', n); agShow(n); toast('Novo mês gerado'); return; }
     if (b.id === 'agics') return exportIcs(ag);
     if (b.id === 'agcsv') return exportCsv(ag);
+    if (b.id === 'agauto') return autoPost(ag);
     agPostAction(b, ag);
   };
   reveal();
@@ -830,6 +832,44 @@ function exportCsv(ag) {
   ag.days.forEach(d => d.posts.forEach(p => rows.push([d.iso.split('-').reverse().join('/'), p.h, C.plats[p.p].nome, S.byId[p.id]?.title || '', p.t, p.l, dl(p.id)].map(q).join(';'))));
   baixar('\uFEFF' + rows.join('\r\n'), 'agenda-vice.csv', 'text/csv');
 }
+/* ---------- Postagem automática (Metricool) ---------- */
+const MC_COLS = ['Text', 'Date', 'Time', 'Draft', 'Facebook', 'Twitter/X', 'LinkedIn', 'GBP', 'Instagram', 'Pinterest', 'TikTok', 'YouTube', 'Threads', 'Bluesky', 'Picture Url 1', 'Instagram Post Type', 'Instagram Show Reel On Feed', 'YouTube Video Title', 'YouTube Video Type', 'YouTube Video Privacy', 'YouTube video for kids', 'Facebook Post Type'];
+function mcCsv(posts) {
+  const q = v => '"' + String(v ?? '').replace(/"/g, '""') + '"';
+  const rows = [MC_COLS.join(',')];
+  posts.forEach(({ d, p }) => {
+    if (p.p === 'kwai') return;
+    const net = { Facebook: p.p === 'facebook', Instagram: p.p === 'reels', TikTok: p.p === 'tiktok', YouTube: p.p === 'shorts' };
+    const r = { Text: p.l, Date: d.iso, Time: p.h + ':00', Draft: 'FALSE', 'Picture Url 1': `https://drive.google.com/file/d/${p.id}/view?usp=sharing`,
+      'Instagram Post Type': net.Instagram ? 'REEL' : '', 'Instagram Show Reel On Feed': net.Instagram ? 'true' : '',
+      'YouTube Video Title': net.YouTube ? p.t.slice(0, 95) + ' #shorts' : '', 'YouTube Video Type': net.YouTube ? 'SHORT' : '', 'YouTube Video Privacy': net.YouTube ? 'PUBLIC' : '', 'YouTube video for kids': net.YouTube ? 'false' : '',
+      'Facebook Post Type': net.Facebook ? 'REEL' : '' };
+    ['Facebook', 'Twitter/X', 'LinkedIn', 'GBP', 'Instagram', 'Pinterest', 'TikTok', 'YouTube', 'Threads', 'Bluesky'].forEach(k => r[k] = net[k] ? 'TRUE' : 'FALSE');
+    rows.push(MC_COLS.map(c => q(r[c])).join(','));
+  });
+  return rows.join('\r\n');
+}
+function autoPost(ag) {
+  if (!can('piloto_lite')) {
+    openModal(`<div class="mhead"><b class="disp" style="font-size:20px">Postar sozinho</b><button class="x" data-x>${ic('x')}</button></div><div class="mbody"><p class="mut">Com o Piloto Automático, esta agenda vira um arquivo que você importa uma vez num agendador e os vídeos são publicados sozinhos, no horário, no TikTok, Reels, Shorts e Facebook. Você não precisa abrir as redes todo dia.</p><a class="btn btn-p" style="width:100%;margin-top:16px;min-height:52px" href="${CFG.produtos.piloto.checkout}" target="_blank" rel="noopener">${ic('bolt')}Liberar o Piloto Automático · ${esc(CFG.produtos.piloto.preco)}</a></div>`);
+    $('#mbox').onclick = e => { if (e.target.closest('[data-x]')) closeModal(); };
+    return;
+  }
+  const semanas = [];
+  for (let w = 0; w < 5; w++) { const ds = ag.days.slice(w * 7, w * 7 + 7); const ps = ds.flatMap(d => d.posts.map(p => ({ d, p }))).filter(x => x.p.p !== 'kwai'); if (ps.length) semanas.push({ w, ds, ps }); }
+  const temKwai = ag.days.some(d => d.posts.some(p => p.p === 'kwai'));
+  openModal(`<div class="mhead"><b class="disp" style="font-size:20px">Postar sozinho com o Metricool</b><button class="x" data-x>${ic('x')}</button></div><div class="mbody">
+    <p class="mut" style="font-size:14px">Você importa a agenda uma vez e o Metricool publica cada vídeo sozinho, no dia e horário certos. Faça uma semana por vez (o Metricool recomenda arquivos de até 50 posts).</p>
+    <div class="steps3" style="margin-top:14px;grid-template-columns:1fr"><div><span class="n">1</span><span><b>Crie a conta grátis no Metricool</b><span>metricool.com · conecte TikTok, Instagram, YouTube e Facebook em Configurações da marca.</span></span></div><div><span class="n">2</span><span><b>Baixe o arquivo da semana aqui embaixo</b><span>Cada linha é um post, com vídeo, legenda, data e horário.</span></span></div><div><span class="n">3</span><span><b>No Metricool: Planejamento → Importar CSV</b><span>Escolha o arquivo e, no formato, marque data AAAA-MM-DD e hora HH:mm:ss. Confira a prévia e confirme.</span></span></div></div>
+    <div style="display:grid;gap:8px;margin-top:16px">${semanas.map(s => `<button class="btn btn-g" data-wk="${s.w}" style="justify-content:space-between;min-height:52px"><span>Semana ${s.w + 1} · ${new Date(s.ds[0].iso + 'T12:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })} a ${new Date(s.ds[s.ds.length - 1].iso + 'T12:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}</span><span class="pill">${s.ps.length} posts</span></button>`).join('')}</div>
+    <div class="alert" style="margin-top:14px">${ic('shield')}<span>O Metricool tem plano grátis com limites de uso; para postar o mês inteiro em várias redes, pode ser preciso um plano pago dele. Se preferir não usar, cada rede também agenda sozinha de graça: Meta Business Suite (Reels e Facebook), TikTok Studio e YouTube Studio.${temKwai ? ' O Kwai não aceita agendamento externo: poste por lá mesmo.' : ''}</span></div>
+  </div>`);
+  $('#mbox').onclick = e => {
+    const b = e.target.closest('button'); if (!b) return;
+    if (b.dataset.x !== undefined) return closeModal();
+    if (b.dataset.wk !== undefined) { const s = semanas.find(x => x.w === +b.dataset.wk); baixar(mcCsv(s.ps), `metricool-semana-${s.w + 1}.csv`, 'text/csv'); toast('Arquivo baixado. Agora importe no Metricool'); }
+  };
+}
 function baixar(txt, nome, tipo) { const u = URL.createObjectURL(new Blob([txt], { type: tipo + ';charset=utf-8' })); const a = document.createElement('a'); a.href = u; a.download = nome; a.click(); setTimeout(() => URL.revokeObjectURL(u), 1500); }
 
 /* ---------- Hoje: o que postar agora ---------- */
@@ -887,6 +927,7 @@ V.grana = (...a) => window.BONUS?.grana ? (can('grana') ? window.BONUS.grana(...
 V.remix = (...a) => window.BONUS?.remix ? (can('remix') ? window.BONUS.remix(...a) : lockCard('remix')) : '';
 V.ferramentas = (...a) => window.BONUS?.ferramentas ? (can('ferramentas') ? window.BONUS.ferramentas(...a) : lockCard('ferramentas')) : '';
 V.estrutura = (...a) => window.BONUS?.estrutura ? window.BONUS.estrutura(...a) : '';
+V.estudio = () => can('piloto_lite') ? window.ESTUDIO.view() : lockCard('piloto_lite', 'O Estúdio Vice faz parte do Piloto Automático: corte vertical com gancho na tela, direto no celular.', 'remix');
 V.extra = (qs, sub) => window.BONUS?.extra ? window.BONUS.extra(qs, sub) : '';
 
 /* =====================================================================
@@ -907,6 +948,7 @@ function route(keepScroll) {
   window.__closeSide && window.__closeSide();
   bindCards(view); bindRails(); bindLib(); bindQuiz(); bindAgenda(); bindHoje();
   window.BONUS?.bind?.(name, sub, qs);
+  if (name === 'estudio' && can('piloto_lite')) window.ESTUDIO.bind(); else window.ESTUDIO?.parar?.();
   const s2 = $('#sair2'); if (s2) s2.onclick = logout;
   if (keepScroll === true) scrollTo(0, y); else if (anchorId) setTimeout(() => document.getElementById(anchorId)?.scrollIntoView({ behavior: 'smooth' }), 80); else if (h !== lastRoute) scrollTo(0, 0);
   lastRoute = h;
