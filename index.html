@@ -116,9 +116,9 @@ b,strong{font-weight:800}
 
 /* números */
 .vs{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:24px}
-.vs .card{padding:20px 18px}
+.vs .card{padding:18px 16px;min-width:0}
 .vs .y{font-size:13px;font-weight:800;color:var(--mut)}
-.vs .n{font-family:Anton,Impact,sans-serif;font-size:clamp(34px,9vw,54px);line-height:1;margin:6px 0 4px}
+.vs .n{font-family:Anton,Impact,sans-serif;font-size:clamp(25px,7.2vw,54px);line-height:1;margin:6px 0 4px;white-space:nowrap}
 .vs .l{font-size:14px;color:var(--mut);line-height:1.35}
 .vs .new{border-color:rgba(255,45,122,.55);background:linear-gradient(160deg,rgba(255,45,122,.2),var(--card) 70%)}
 .vs .new .n{color:#fff;text-shadow:0 0 22px rgba(255,45,122,.55)}
@@ -130,6 +130,7 @@ b,strong{font-weight:800}
 
 /* 2013 */
 .split{display:grid;grid-template-columns:1.1fr .9fr;gap:30px;align-items:center}
+.split>*{min-width:0}
 .split-img{border-radius:22px;overflow:hidden;aspect-ratio:4/5;position:relative;border:1px solid rgba(255,214,232,.18);box-shadow:0 24px 60px -34px rgba(255,138,61,.55)}
 .split-img img{width:100%;height:100%;object-fit:cover}
 .split-img .cap{position:absolute;left:14px;right:14px;bottom:14px;background:rgba(20,10,36,.72);backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:14px;padding:12px 14px;font-weight:700;font-size:15px}
@@ -178,13 +179,13 @@ b,strong{font-weight:800}
 .total .nw{font-family:Anton,Impact,sans-serif;font-size:40px;line-height:1;text-shadow:0 0 20px rgba(255,45,122,.5)}
 
 /* app */
-.mock{max-width:360px;margin:0 auto;border-radius:38px;padding:12px;background:linear-gradient(160deg,#3a2458,#140a24);border:1px solid rgba(255,214,232,.18);box-shadow:0 40px 90px -30px rgba(255,45,122,.6),inset 0 0 0 1px rgba(255,255,255,.04)}
+.mock{width:100%;max-width:360px;margin:0 auto;border-radius:38px;padding:12px;background:linear-gradient(160deg,#3a2458,#140a24);border:1px solid rgba(255,214,232,.18);box-shadow:0 40px 90px -30px rgba(255,45,122,.6),inset 0 0 0 1px rgba(255,255,255,.04)}
 .screen{border-radius:28px;background:#0f0820;overflow:hidden;padding:16px 14px 18px}
 .notch{width:90px;height:22px;border-radius:0 0 14px 14px;background:#2a1a42;margin:-16px auto 14px}
 .app-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
 .app-h b{font-family:Anton,Impact,sans-serif;font-size:20px;text-transform:uppercase;letter-spacing:.5px}
 .app-h span{font-size:11px;font-weight:800;color:#06221f;background:var(--aqua);padding:4px 9px;border-radius:99px}
-.chips{display:flex;gap:6px;overflow:hidden;margin-bottom:12px}
+.chips{display:flex;gap:6px;overflow:hidden;margin-bottom:12px;-webkit-mask-image:linear-gradient(90deg,#000 80%,transparent);mask-image:linear-gradient(90deg,#000 80%,transparent)}
 .chips span{font-size:11.5px;font-weight:700;padding:6px 10px;border-radius:99px;border:1px solid var(--line);white-space:nowrap;color:var(--mut)}
 .chips span.on{background:var(--sunset);color:#fff;border-color:transparent}
 .vrow{display:grid;grid-template-columns:52px 1fr auto;gap:12px;align-items:center;padding:9px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid var(--line);margin-bottom:8px}
@@ -197,15 +198,15 @@ b,strong{font-weight:800}
 .mb.go{background:var(--cta);border-color:transparent}
 .mb.ok{color:var(--aqua);border-color:rgba(34,211,197,.5)}
 .cats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:22px}
-.cat{padding:14px 12px}
+.cat{padding:14px 12px;min-width:0}
 .cat b{font-family:Anton,Impact,sans-serif;font-size:26px;line-height:1;display:block}
 .cat span{font-size:12.5px;color:var(--mut);font-weight:600}
 
 /* conta */
 .calc{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:22px}
-.calc .card{padding:18px 12px;text-align:center}
-.calc .n{font-family:Anton,Impact,sans-serif;font-size:clamp(28px,7.5vw,44px);line-height:1;white-space:nowrap}
-.calc .l{font-size:13px;color:var(--mut);margin-top:8px;line-height:1.3;font-weight:600}
+.calc .card{padding:16px 8px;text-align:center;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start}
+.calc .n{font-family:Anton,Impact,sans-serif;font-size:clamp(24px,6.6vw,44px);line-height:1;white-space:nowrap}
+.calc .l{font-size:12.5px;color:var(--mut);margin-top:8px;line-height:1.3;font-weight:600}
 
 /* bônus 6 */
 .d7{border:1.5px solid rgba(34,211,197,.5);background:linear-gradient(140deg,rgba(34,211,197,.16),var(--card) 60%);padding:28px 22px}
@@ -280,22 +281,33 @@ footer p+p{margin-top:8px}
   .plan.pro{order:-1}
   .sticky{display:flex}
   .btn{max-width:none}
-  .cmp-r div{padding:12px;font-size:14px}
+  .cmp-r div{padding:12px 10px;font-size:13.5px;gap:8px}
+  .wrap{padding:0 20px}
+  .vs{gap:10px}
+  .cats{gap:8px}
+  .cat b{font-size:24px}
+  .item h3{padding-right:58px}
+  .guar>div:last-child{text-align:left}
+  .guar .eyebrow{justify-content:flex-start}
   .cmp-h div{padding:12px;font-size:16px}
 }
 @media (prefers-reduced-motion:reduce){.btn:after,.dot,.hero h1 .script{animation:none!important}.ticker-in{animation-duration:60s}}
 /* gerador */
 .gen{margin-top:24px;padding:18px 16px 20px;text-align:left}
-.gen-h{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.gen-h{display:flex;justify-content:space-between;align-items:baseline;gap:4px 10px;margin-bottom:10px;flex-wrap:wrap}
 .gen-h b{font-family:Anton,Impact,sans-serif;font-size:22px;text-transform:uppercase;letter-spacing:.5px}
 .gen-h span{font-size:12px;font-weight:700;color:var(--mut)}
-.cal{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}
-.day{min-width:0;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid var(--line);padding:6px 5px 5px;min-height:62px;display:flex;flex-direction:column;gap:4px;transition:transform .35s cubic-bezier(.2,.8,.2,1.2),opacity .35s}
+.leg{display:flex;flex-wrap:wrap;gap:6px 12px;margin:0 0 12px}
+.leg span{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;color:var(--mut)}
+.leg i{width:9px;height:9px;border-radius:3px;background:var(--c)}
+.cal{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+.day{min-width:0;border-radius:10px;background:rgba(255,255,255,.04);border:1px solid var(--line);padding:7px 6px;min-height:60px;display:flex;flex-direction:column;justify-content:space-between;gap:5px;transition:transform .35s cubic-bezier(.2,.8,.2,1.2),opacity .35s}
 .day.pop{opacity:0;transform:scale(.6)}
 .day i{font-style:normal;font-size:10.5px;font-weight:800;color:var(--dim)}
 .day em{font-style:normal;font-size:9.5px;font-weight:800;color:#fff;border-radius:6px;padding:3px 4px;background:var(--c);line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .day u{text-decoration:none;font-size:10px;font-weight:700;color:var(--mut)}
 .gen-f{display:flex;gap:10px;align-items:center;justify-content:space-between;margin-top:14px;flex-wrap:wrap}
+@media (max-width:560px){.gen{padding:16px 12px 18px}.day{min-height:54px;padding:7px 5px 6px;align-items:center;text-align:center}.day i{font-family:Anton,Impact,sans-serif;font-size:15px;font-weight:400;color:#fff;letter-spacing:.3px}.day i b{display:none}.day em{width:100%;height:6px;padding:0;font-size:0;border-radius:3px}.day u{font-size:10.5px}.day u s{display:none}.gen-f{flex-direction:column;align-items:stretch;text-align:center}.gen-f .btn{width:100%;justify-content:center}.gen-f .small{max-width:none}}
 .gen-f .btn{font-family:inherit;cursor:pointer;width:auto;min-height:48px;padding:10px 18px;font-size:14px;flex-direction:row;gap:8px;margin:0}
 .gen-f .btn .ic{width:18px;height:18px}
 .gen-f .small{max-width:260px}
@@ -471,6 +483,7 @@ footer p+p{margin-top:8px}
     <p class="lead">O gerador pega os vídeos do app que você ainda não postou e monta seus 30 dias: qual vídeo, que dia e que horário. Acabou o mês? Gera de novo, quantas vezes quiser.</p>
     <div class="card gen">
       <div class="gen-h"><b id="gen-mes">Dezembro</b><span>3 posts por dia · TikTok, Reels e Shorts</span></div>
+      <div class="leg" id="leg"></div>
       <div class="cal" id="cal"></div>
       <div class="gen-f"><button type="button" class="btn" id="gen-btn"><svg class="ic"><use href="#i-refresh"/></svg>Gerar de novo</button><span class="small">Toque e veja o gerador montar outro mês. Imagem ilustrativa.</span></div>
     </div>
@@ -543,7 +556,7 @@ footer p+p{margin-top:8px}
     <h2>Menos de <span class="sun">1 centavo</span> por vídeo.</h2>
     <div class="calc">
       <div class="card"><div class="n">+2.000</div><div class="l">vídeos para começar</div></div>
-      <div class="card"><div class="n">+1 ano</div><div class="l">de conteúdo postando 3 por dia</div></div>
+      <div class="card"><div class="n">+1 ano</div><div class="l">de posts, 3 por dia</div></div>
       <div class="card"><div class="n">R$ 19,90</div><div class="l">uma vez só, sem mensalidade</div></div>
     </div>
     <p class="lead" style="margin-top:22px">Um editor cobra caro por <b>um</b> vídeo. Aqui você leva mais de dois mil, lote novo toda semana e o caminho para monetizar, pelo preço de um lanche.</p>
@@ -610,7 +623,7 @@ footer p+p{margin-top:8px}
           <li><svg class="ic"><use href="#i-check"/></svg>Comunidade + suporte</li>
           <li><svg class="ic"><use href="#i-check"/></svg><span><b>Estrutura de Vendas</b> Vice City</span></li>
         </ul>
-        <a href="#CHECKOUT_COMPLETO" class="btn">Quero o Canal Completo<small>3x mais vídeos + recarga e todos os bônus</small></a>
+        <a href="#CHECKOUT_COMPLETO" class="btn">Quero o Completo<small>3x mais vídeos, recarga e todos os bônus</small></a>
       </div>
     </div>
     <div class="secure"><span><svg class="ic"><use href="#i-lock"/></svg>Compra segura</span><span><svg class="ic"><use href="#i-bolt"/></svg>PIX libera na hora</span><span><svg class="ic"><use href="#i-card"/></svg>Cartão</span><span><svg class="ic"><use href="#i-shield"/></svg>Garantia de 7 dias</span></div>
@@ -675,7 +688,7 @@ footer p+p{margin-top:8px}
       <div class="card road bad"><div><h3>Esperar</h3><p>Ver outros perfis crescendo com GTA 6 enquanto a onda passa. De novo, como em 2013.</p></div></div>
       <div class="card road good"><div><h3>Começar hoje</h3><p>Canal no ar hoje, 30 dias agendados, lote novo toda semana e o mapa para monetizar.</p></div></div>
     </div>
-    <a href="#planos" class="btn">Quero meu canal por R$ 19,90<small>Oferta de lançamento até 30/11</small></a>
+    <a href="#planos" class="btn">Quero meu canal agora<small>R$ 19,90 · oferta de lançamento até 30/11</small></a>
     <div class="trust" style="justify-content:center"><span><svg class="ic"><use href="#i-check"/></svg>Acesso imediato</span><span><svg class="ic"><use href="#i-check"/></svg>Garantia dupla</span><span><svg class="ic"><use href="#i-check"/></svg>Pagamento único</span></div>
   </div>
 </section>
@@ -707,16 +720,17 @@ document.documentElement.classList.add('js');
   function count(el){var t=el.textContent,m=t.match(/[\d.,]+/);if(!m||el.dataset.c)return;el.dataset.c=1;var raw=m[0],dec=(raw.split(',')[1]||'').length,num=parseFloat(raw.replace(/\./g,'').replace(',','.')),t0=null;
     function f(ts){if(!t0)t0=ts;var k=Math.min((ts-t0)/1200,1),v=num*(1-Math.pow(1-k,3));var s=v.toFixed(dec).replace('.',',');if(num>=1000)s=Math.round(v).toLocaleString('pt-BR');el.textContent=t.replace(raw,s);if(k<1)requestAnimationFrame(f)}requestAnimationFrame(f)}
   if(!('IntersectionObserver' in window)){els.concat(ics).forEach(function(e){e.classList.add('in')});return}
-  var io=new IntersectionObserver(function(es){es.forEach(function(x){if(x.isIntersecting){x.target.classList.add('in');[].forEach.call(x.target.querySelectorAll('.vs .n,.cat b,.calc .n'),count);if(x.target.matches('.vs .card,.cat,.calc .card'))[].forEach.call(x.target.querySelectorAll('.n,b'),count);io.unobserve(x.target)}})},{threshold:.12,rootMargin:'0px 0px -6% 0px'});
+  var io=new IntersectionObserver(function(es){es.forEach(function(x){if(x.isIntersecting){x.target.classList.add('in');[].forEach.call(x.target.querySelectorAll('.vs .n,.cat b'),count);if(x.target.matches('.vs .card,.cat'))[].forEach.call(x.target.querySelectorAll('.n,b'),count);io.unobserve(x.target)}})},{threshold:.12,rootMargin:'0px 0px -6% 0px'});
   els.concat(ics).forEach(function(e){io.observe(e)});
 })();
 (function(){
   /* gerador de agenda (demonstração) */
   var cal=document.getElementById('cal'),btn=document.getElementById('gen-btn');if(!cal)return;
   var cats=[['Curiosidade','#ff2d7a'],['Corte','#7c3aed'],['Meme','#ff8a3d'],['Teoria','#2563eb'],['React','#0f9f94'],['Easter egg','#d6336c']],hs=['12h','15h','18h','19h','20h','21h'];
-  function gen(){cal.innerHTML='';for(var d=1;d<=30;d++){var c=cats[Math.floor(Math.random()*cats.length)],h=hs[Math.floor(Math.random()*hs.length)],el=document.createElement('div');el.className='day pop';el.innerHTML='<i>'+String(d).padStart(2,'0')+'/12</i><em style="--c:'+c[1]+'">'+c[0]+'</em><u>'+h+' · 3 posts</u>';cal.appendChild(el);(function(el,d){setTimeout(function(){el.classList.remove('pop')},40+d*28)})(el,d)}}
-  btn.addEventListener('click',gen);
-  if('IntersectionObserver' in window){var o=new IntersectionObserver(function(es){if(es[0].isIntersecting){gen();o.disconnect()}},{threshold:.25});o.observe(cal)}else gen();
+  function gen(){cal.innerHTML='';for(var d=1;d<=30;d++){var c=cats[Math.floor(Math.random()*cats.length)],h=hs[Math.floor(Math.random()*hs.length)],el=document.createElement('div');el.className='day pop';el.innerHTML='<i>'+String(d).padStart(2,'0')+'<b>/12</b></i><em style="--c:'+c[1]+'">'+c[0]+'</em><u>'+h+'<s> · 3 posts</s></u>';cal.appendChild(el);(function(el,d){setTimeout(function(){el.classList.remove('pop')},40+d*28)})(el,d)}}
+  var leg=document.getElementById('leg');if(leg)leg.innerHTML=cats.map(function(c){return '<span><i style="--c:'+c[1]+'"></i>'+c[0]+'</span>'}).join('');
+  btn.addEventListener('click',gen);gen();
+  if('IntersectionObserver' in window){var o=new IntersectionObserver(function(es){if(es[0].isIntersecting){gen();o.disconnect()}},{threshold:.3});o.observe(document.querySelector('.gen'))}
 })();
 (function(){
   var end=new Date('2026-11-30T23:59:59-03:00').getTime(),el=document.getElementById('cd');
