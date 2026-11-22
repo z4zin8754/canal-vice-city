@@ -338,7 +338,7 @@ select.input option{background:#1d1036}
   .toc a{white-space:nowrap;border:1px solid var(--line)}
   .ag-form{grid-template-columns:1fr}
   .player-wrap{grid-template-columns:1fr}
-  .player{aspect-ratio:9/14;max-height:60vh}
+  .player{aspect-ratio:9/14;max-height:60vh;width:100%;max-width:min(100%,calc(60vh*9/14));margin:0 auto}
   .login{grid-template-columns:1fr}
   .login-art{height:300px}
   .login-art::after{background:linear-gradient(0deg,rgba(15,8,32,1) 0%,rgba(15,8,32,.2) 60%)}

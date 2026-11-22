@@ -648,8 +648,10 @@ function agGerar(cfg) {
       const n = Math.max(...plats.map(([, n]) => n));
       for (let i = 0; i < n; i++) {
         const wantsLong = cfg.longo && cfg.plats.tiktok > i && i === 0 && longos.length;
-        const v = wantsLong ? (() => { const x = longos.pop(); used.add(x.id); return x; })() : take();
-        plats.forEach(([p, cnt]) => { if (i < cnt) posts.push(mkPost(v, p, C.plats[p].horas[i], d, i)); });
+        const lv = wantsLong ? (() => { const x = longos.pop(); used.add(x.id); return x; })() : null;
+        const others = plats.some(([p, cnt]) => p !== 'tiktok' && i < cnt);
+        const v = lv && !others ? lv : take();
+        plats.forEach(([p, cnt]) => { if (i < cnt) posts.push(mkPost(p === 'tiktok' && lv ? lv : v, p, C.plats[p].horas[i], d, i)); });
       }
     } else {
       plats.forEach(([p, cnt]) => { for (let i = 0; i < cnt; i++) { const v = (p === 'tiktok' && cfg.longo && i === 0 && longos.length) ? (() => { const x = longos.pop(); used.add(x.id); return x; })() : take(); posts.push(mkPost(v, p, C.plats[p].horas[i], d, i)); } });
