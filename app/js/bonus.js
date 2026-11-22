@@ -213,13 +213,13 @@ function limparMp4(b) {
    ESTRUTURA DE VENDAS
    ===================================================================== */
 B.estrutura = () => {
-  if (!can('estrutura')) return lockCard('estrutura', 'A Estrutura de Vendas Vice City faz parte do plano Completo.');
+  if (!can('estrutura')) return lockCard('estrutura', 'A Código do Dinheiro faz parte do plano Completo.');
   const ini = load('primeiro', Date.now());
   const libera = ini + CFG.DIAS_ESTRUTURA * 864e5;
   if (Date.now() < libera && !window.CVC_FORCAR_ESTRUTURA) {
-    return hero(`${ic('clock')} Bônus 6 · libera em breve`, 'Estrutura de', 'vendas', `Esse bônus é liberado ${CFG.DIAS_ESTRUTURA} dias depois do seu primeiro acesso. Até lá, foque em colocar o canal no ar: é ele que vai trazer o público para você vender.`, 'estrutura', `<div class="countdown" id="cd" data-t="${libera}" style="justify-content:flex-start"></div><a class="btn btn-p" href="#/rota">${ic('star')}Seguir a Rota Vice City</a>`);
+    return hero(`${ic('clock')} Bônus 6 · libera em breve`, 'Código do', 'Dinheiro', `Esse bônus é liberado ${CFG.DIAS_ESTRUTURA} dias depois do seu primeiro acesso. Até lá, foque em colocar o canal no ar: é ele que vai trazer o público para você vender.`, 'estrutura', `<div class="countdown" id="cd" data-t="${libera}" style="justify-content:flex-start"></div><a class="btn btn-p" href="#/rota">${ic('star')}Seguir a Rota Vice City</a>`);
   }
-  return hero(`${ic('funnel')} Bônus 6`, 'Estrutura de', 'vendas', 'O mesmo funil que estamos usando para vender o Canal Vice City, aberto para você adaptar ao seu produto e vender para o público do seu canal.', 'estrutura') + `
+  return hero(`${ic('funnel')} Bônus 6`, 'Código do', 'Dinheiro', 'O mesmo funil que estamos usando para vender o Canal Vice City, aberto para você adaptar ao seu produto e vender para o público do seu canal.', 'estrutura') + `
   <section class="sec"><div class="sec-h"><div><h2 class="h2">O funil em 1 minuto</h2><p>Toque em cada etapa para ver como montamos.</p></div></div>
   <div class="row" id="funil" style="gap:8px">${FUNIL.map((f, i) => `<button class="chip ${i === 0 ? 'on' : ''}" data-fu="${i}">${i + 1}. ${f[0]}</button>`).join('')}</div>
   <div class="card glow" id="fubox" style="margin-top:14px"></div></section>` + doc([

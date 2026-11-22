@@ -194,7 +194,7 @@ const NAV = [
   ]],
   ['Fazer dinheiro', [
     ['grana', 'Mapa da Grana', 'coin', 'grana'],
-    ['estrutura', 'Estrutura de Vendas', 'funnel', 'estrutura']
+    ['estrutura', 'Código do Dinheiro', 'funnel', 'estrutura']
   ]],
   ['Extras', [
     ['extra/capas', 'Kit Capas', 'tag', 'capas'],
@@ -909,7 +909,7 @@ V.bonus = () => {
     ['Comece aqui', [['rota', 'plano', 'Rota Vice City', 'As 6 missões em ordem', null], ['guia', 'canal', 'Guia do iniciante', 'Dúvidas de quem está começando', null], ['plano', 'plano', 'Plano de Golpe', 'Sua estratégia em 5 perguntas', null]]],
     ['Seus vídeos', [['recarga', 'recarga', 'Recarga Vice City', 'Lote novo toda semana', null], ['ineditos', 'ineditos', 'Cortes Inéditos', 'Só aqui, feitos pelo nosso time', 'ineditos'], ['imagens', 'imagens', 'Imagens para feed', `${fmt(S.imgs.length)} posts prontos`, null]]],
     ['Crescer o canal', [['agenda', 'agenda', 'Gerador Agenda Vice', 'Seu mês em 1 clique', 'agenda'], ['canal', 'canal', 'Canal do Zero', 'Perfil pronto em 1 hora', 'canal'], ['remix', 'remix', 'Kit Remix', `${C.totalGanchos} ganchos + gerador`, 'remix'], ['ferramentas', 'ferramentas', 'Ferramentas', 'Logos, capas e limpeza do arquivo', 'ferramentas']]],
-    ['Fazer dinheiro', [['grana', 'grana', 'Mapa da Grana', `${C.rotas.length} formas de monetizar`, 'grana'], ['estrutura', 'estrutura', 'Estrutura de Vendas', 'O nosso funil, aberto para você', 'estrutura']]],
+    ['Fazer dinheiro', [['grana', 'grana', 'Mapa da Grana', `${C.rotas.length} formas de monetizar`, 'grana'], ['estrutura', 'estrutura', 'Código do Dinheiro', 'O nosso sistema de vendas, aberto para você', 'estrutura']]],
     ['Extras', [['extra/capas', 'capas', 'Kit Capas', 'Capas que fazem clicar', 'capas'], ['extra/carrossel', 'carrossel', 'Pack Carrossel', 'Carrosséis prontos para o feed', 'carrossel'], ['extra/piloto', 'piloto', 'Piloto Automático', 'Robô de Cortes e prompts', 'piloto_lite']]]
   ];
   return `${heroX('login', `${ic('gem')} Seu arsenal`, 'Bônus e', 'extras', 'Tudo o que vem com o Canal Vice City, organizado pelo que você quer fazer agora.', '', '', 'sm eager')}
@@ -997,6 +997,24 @@ async function boot() {
   if (!MODO_PREVIA && !S.acc.size) { document.body.innerHTML = SPRITE; viewLogin('Não encontramos uma compra aprovada para ' + S.user.email + '. Use o mesmo e-mail da compra ou fale com o suporte.'); await S.sb.auth.signOut(); return; }
   shell(); route();
   if (!load('boasvindas', false)) setTimeout(welcome, 500);
+  liveSync();
+}
+async function liveSync() {
+  try {
+    const ctl = new AbortController(); setTimeout(() => ctl.abort(), 8000);
+    const j = await fetch('/api/catalogo', { signal: ctl.signal }).then(r => r.json());
+    if (!j.ok || !j.videos) return;
+    Object.assign(C.temas, j.criadores || {});
+    const fold = x => x.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
+    let novos = 0;
+    j.videos.forEach(([id, c, raw, mb, tema]) => {
+      if (S.byId[id] || !C.cats[c]) return;
+      const v = { id, cat: c, raw, mb, tema, start: false, fresh: true };
+      v.title = pretty(v); v.search = fold(v.title + ' ' + raw + ' ' + C.cats[c].nome + ' ' + (C.temas[tema] || ''));
+      S.byId[id] = v; S.vids.unshift(v); novos++;
+    });
+    if (novos) { const n = (location.hash.split('?')[0].replace('#/', '') || 'qg'); if (['recarga', 'biblioteca', 'ineditos', 'qg', 'hoje'].includes(n)) route(true); }
+  } catch {}
 }
 function welcome() {
   openModal(`<div class="welcome"><img class="wl" src="${LOGO}" alt="Canal Vice City"><h2><span class="chrome disp" style="font-size:30px;display:block">Bem-vindo a</span><span class="brush" style="font-size:52px">Vice City</span></h2>

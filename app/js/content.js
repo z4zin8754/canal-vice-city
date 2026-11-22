@@ -18,7 +18,7 @@ C.cats = {
   longos:       { nome: 'Vídeos longos',     curto: 'Longos',       cor: '#c084fc', desc: 'Vídeos maiores. Bons para TikTok acima de 1 minuto e para cortar em várias partes.' },
   geral:        { nome: 'Acervo geral',      curto: 'Geral',        cor: '#94a3b8', desc: 'O grosso do acervo: mais de 1.500 vídeos para nunca faltar post.' }
 };
-C.temas = { streamer: 'Streamers', curiosidade: 'Curiosidade', clipe: 'Clipe', edit: 'Edit', gameplay: 'Gameplay', meme: 'Meme', bug: 'Bugs', ia: 'IA', coringa: 'Loud Coringa', davyjones: 'Davy Jones' };
+C.temas = { streamer: 'Streamers', curiosidade: 'Curiosidade', clipe: 'Clipe', edit: 'Edit', gameplay: 'Gameplay', meme: 'Meme', bug: 'Bugs', ia: 'IA', coringa: 'Loud Coringa', loudcoringa: 'Loud Coringa', davyjones: 'Davy Jones' };
 
 /* ---------- Plataformas ---------- */
 C.plats = {
@@ -258,8 +258,8 @@ C.rotas = [
     passos: ['Cadastre-se em um programa de afiliados de loja grande', 'Escolha 3 produtos que fazem sentido para gamer', 'Coloque o link na bio e cite no vídeo quando fizer sentido', 'Avise quando houver comissão (transparência)'],
     alerta: 'Sinalize a relação comercial sempre.' },
   { id: 'proprio', nome: 'Vender seu próprio produto', quando: 'Com audiência', seguidores: 'A partir de um público engajado', cor: '#4ade80',
-    como: 'O caminho que mais paga: transformar seu público em clientes de um produto seu. É exatamente o que a Estrutura de Vendas Vice City ensina.',
-    passos: ['Junte um público fiel no nicho', 'Crie uma oferta simples (pack, guia, consultoria)', 'Siga a Estrutura de Vendas Vice City', 'Use o direct com palavra-chave para vender no automático'],
+    como: 'O caminho que mais paga: transformar seu público em clientes de um produto seu. É exatamente o que a Código do Dinheiro Vice City ensina.',
+    passos: ['Junte um público fiel no nicho', 'Crie uma oferta simples (pack, guia, consultoria)', 'Siga a Código do Dinheiro Vice City', 'Use o direct com palavra-chave para vender no automático'],
     alerta: 'Comece pequeno e valide antes de investir em anúncio.' }
 ];
 
