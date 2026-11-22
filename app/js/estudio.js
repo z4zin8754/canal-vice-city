@@ -149,11 +149,14 @@ function tipoSaida() {
   return ts.find(t => window.MediaRecorder && MediaRecorder.isTypeSupported(t)) || '';
 }
 let actx, src, dest;
+const dbg = m => { (window.__esDbg = window.__esDbg || []).push(Date.now() % 100000 + ' ' + m); };
 async function gravar(seg) {
+  dbg('inicio');
   if (!window.MediaRecorder || !cv.captureStream) throw new Error('sem suporte');
   const tipo = tipoSaida();
   actx = actx || new (window.AudioContext || window.webkitAudioContext)();
-  if (actx.state === 'suspended') await actx.resume();
+  if (actx.state === 'suspended') await Promise.race([actx.resume(), new Promise(r => setTimeout(r, 1500))]);
+  dbg('audio ' + actx.state);
   if (!src || src.mediaElement !== vid) { src = actx.createMediaElementSource(vid); dest = actx.createMediaStreamDestination(); src.connect(dest); }
   vid.muted = false;
   const stream = new MediaStream([...cv.captureStream(30).getVideoTracks(), ...dest.stream.getAudioTracks()]);
@@ -161,19 +164,21 @@ async function gravar(seg) {
   const parts = [];
   rec.ondataavailable = e => { if (e.data && e.data.size) parts.push(e.data); };
   st.gravando = true;
-  vid.currentTime = seg.a;
-  await new Promise(r => { const f = () => { vid.removeEventListener('seeked', f); r(); }; vid.addEventListener('seeked', f); });
+  await new Promise(r => { const f = () => { vid.removeEventListener('seeked', f); r(); }; vid.addEventListener('seeked', f); setTimeout(f, 1500); vid.currentTime = seg.a + 0.001; });
+  dbg('seek ok');
   rec.start(500);
   await vid.play();
+  dbg('play');
   await new Promise(res => {
-    const tick = () => {
+    const iv = setInterval(() => {
       const p = (vid.currentTime - seg.a) / (seg.b - seg.a);
       const bar = $('#esbar'); if (bar) bar.style.width = Math.min(100, p * 100) + '%';
-      if (vid.currentTime >= seg.b || vid.ended || !st.gravando) { vid.pause(); res(); } else requestAnimationFrame(tick);
-    };
-    tick();
+      if (vid.currentTime >= seg.b || vid.ended || vid.paused || !st.gravando) { clearInterval(iv); vid.pause(); res(); }
+    }, 100);
   });
-  await new Promise(r => { rec.onstop = r; rec.stop(); });
+  dbg('fim trecho');
+  await new Promise(r => { rec.onstop = r; try { rec.requestData(); rec.stop(); } catch (e) { r(); } setTimeout(r, 3000); });
+  dbg('parado ' + parts.length);
   vid.muted = true; st.gravando = false;
   const ext = (rec.mimeType || tipo).includes('mp4') ? 'mp4' : 'webm';
   return { blob: new Blob(parts, { type: (rec.mimeType || tipo || 'video/webm').split(';')[0] }), ext };

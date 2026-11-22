@@ -35,7 +35,11 @@ function toggleSet(k, id) { const s = new Set(load(k, [])); s.has(id) ? s.delete
 /* ---------- Toast ---------- */
 let toastT;
 function toast(msg) { const t = $('#toast'); t.innerHTML = ic('check') + esc(msg); t.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), 1900); }
-async function copy(txt, msg = 'Copiado') { try { await navigator.clipboard.writeText(txt); toast(msg); } catch { prompt('Copie o texto:', txt); } }
+async function copy(txt, msg = 'Copiado') {
+  try { await navigator.clipboard.writeText(txt); toast(msg); return; } catch {}
+  try { const t = document.createElement('textarea'); t.value = txt; t.setAttribute('readonly', ''); t.style.cssText = 'position:fixed;top:0;left:0;opacity:0'; document.body.appendChild(t); t.select(); t.setSelectionRange(0, txt.length); const ok = document.execCommand('copy'); t.remove(); if (ok) { toast(msg); return; } } catch {}
+  openModal(`<div class="mhead"><b>Copie o texto</b><button class="x" onclick="document.getElementById('modal').click()">${ic('x')}</button></div><div class="mbody"><p class="mut" style="font-size:13px;margin-bottom:8px">Toque e segure no texto e escolha Selecionar tudo e Copiar.</p><textarea class="input" rows="8" readonly style="width:100%">${esc(txt)}</textarea></div>`);
+}
 
 /* ---------- RNG ---------- */
 function rng(seed) { let a = seed >>> 0; return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
