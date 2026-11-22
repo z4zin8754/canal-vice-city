@@ -196,3 +196,18 @@ body::before{background:
   .rail-track{grid-auto-columns:46%}
   .hx .t2{font-size:44px}
 }
+
+/* ajustes v2.1 */
+.vc .th img.cvb{inset:auto;left:10px;top:10px;width:28px;height:28px;object-fit:cover;transform:none!important}
+@media (max-width:980px){
+  .hx::after{background:linear-gradient(0deg,rgba(7,3,14,.97) 0%,rgba(7,3,14,.78) 38%,rgba(7,3,14,.2) 72%,rgba(7,3,14,.05) 100%)}
+  .preview-bar{font-size:12px;line-height:1.4}
+}
+@media (max-width:560px){
+  .hx .logo-big{display:none}
+  .hx{min-height:420px}
+  .track{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+  .tstep{padding:12px 4px;gap:4px;border-radius:14px}
+  .tstep .st{width:32px;height:32px}.tstep .st svg{width:28px;height:28px}
+  .tstep small{font-size:9.5px}.tstep b{font-size:12px}
+}

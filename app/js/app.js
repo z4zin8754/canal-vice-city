@@ -890,9 +890,9 @@ function welcome() {
   openModal(`<div class="welcome"><img class="wl" src="${LOGO}" alt="Canal Vice City"><h2><span class="chrome disp" style="font-size:30px;display:block">Bem-vindo a</span><span class="brush" style="font-size:52px">Vice City</span></h2>
   <p class="mut" style="margin-top:10px">Aqui você tem tudo para colocar um canal de GTA 6 no ar e fazer dinheiro com ele. Para não se perder, siga a Rota Vice City: 6 missões, uma estrela de procurado para cada.</p>
   <div class="wsteps">${ROTA.map((m, i) => `<div>${STAR}<span><b>${i + 1}.</b> ${m.n}</span></div>`).join('')}</div>
-  <button class="btn btn-p" id="wgo" style="width:100%">${ic('rocket')}Começar a missão 1</button><button class="btn btn-g btn-s" id="wlater" style="margin-top:10px;width:100%">Explorar primeiro</button></div>`);
+  <button class="btn btn-p" id="wgo" style="width:100%">${ic('rocket')}${nextMission() === null ? 'Ver minha rota' : 'Começar a missão ' + (nextMission() + 1)}</button><button class="btn btn-g btn-s" id="wlater" style="margin-top:10px;width:100%">Explorar primeiro</button></div>`);
   const done = () => save('boasvindas', true);
-  $('#wgo').onclick = () => { done(); closeModal(); location.hash = '#/plano'; };
+  $('#wgo').onclick = () => { done(); closeModal(); const n = nextMission(); location.hash = n === null ? '#/rota' : ROTA[n].r; };
   $('#wlater').onclick = () => { done(); closeModal(); };
 }
 window.addEventListener('hashchange', () => route());
