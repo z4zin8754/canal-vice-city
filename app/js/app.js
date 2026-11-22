@@ -518,19 +518,40 @@ V.ineditos = () => {
 };
 
 /* ---------- Imagens ---------- */
-let IMGN = 60;
-V.imagens = () => {
-  IMGN = 60;
-  setTimeout(imgRender);
-  return `${heroX('imagens', `${ic('card')} ${fmt(S.imgs.length)} imagens`, 'Imagens', 'para o feed', 'Posts em imagem para feed, stories e carrossel. Baixe no tamanho original.', '', '', 'sm eager')}<div style="height:18px"></div>
-  <div class="vgrid" id="igrid" style="grid-template-columns:repeat(auto-fill,minmax(160px,1fr))"></div><div class="pager"><button class="btn btn-g" id="imore">Carregar mais</button></div>`;
+let IMGN = 40, IMGF = 's';
+const IMGFMT = {
+  s: { n: 'Stories', ar: '9/16', onde: 'Stories do Instagram e do Facebook, status do WhatsApp', como: 'Poste 1 ou 2 por dia com uma enquete ("Você jogaria isso?") ou caixinha de pergunta. Stories mantém quem já te segue voltando ao perfil.' },
+  f: { n: 'Feed e carrossel', ar: '4/5', onde: 'Feed do Instagram, carrossel e Facebook', como: 'Junte 5 imagens num carrossel com o tema "detalhes que você não viu" e poste 3 vezes por semana. Carrossel gera salvamento, e salvamento leva o perfil para mais gente.' },
+  q: { n: 'Quadradas', ar: '1/1', onde: 'Feed, Threads, X e grupos', como: 'Use como post de opinião: imagem + pergunta na legenda ("Qual a melhor parte?"). Ótimo para gerar comentário entre um vídeo e outro.' },
+  p: { n: 'Paisagem', ar: '16/9', onde: 'Aba Comunidade do YouTube, Facebook, X e fundo de capa', como: 'Na aba Comunidade do YouTube, poste uma imagem por dia com enquete. Também servem de fundo para montar capas e banners.' }
 };
+V.imagens = () => {
+  IMGN = 40;
+  const cnt = k => S.imgs.filter(x => x[2] === k).length;
+  setTimeout(imgRender);
+  return `${heroX('imagens', `${ic('card')} ${fmt(S.imgs.length)} imagens`, 'Imagens', 'para o feed', 'Imagens para manter o perfil vivo entre um vídeo e outro, separadas pelo lugar onde você vai postar.', '', '', 'sm eager')}
+  <section class="sec"><div class="steps3"><div><span class="n">1</span><span><b>Escolha onde vai postar</b><span>Stories, feed, quadrado ou paisagem.</span></span></div><div><span class="n">2</span><span><b>Baixe a imagem</b><span>Toque nela e depois em Baixar.</span></span></div><div><span class="n">3</span><span><b>Copie a legenda</b><span>Vem com pergunta para gerar comentário.</span></span></div></div></section>
+  <div class="imgtabs sec" id="imgtabs">${Object.entries(IMGFMT).map(([k, f]) => `<button class="${k === IMGF ? 'on' : ''}" data-f="${k}"><b>${f.n}</b><span>${cnt(k)} imagens</span></button>`).join('')}</div>
+  <div class="card sec" id="imgtip"></div>
+  <div class="igrid" id="igrid"></div><div class="pager"><button class="btn btn-g" id="imore">Carregar mais</button></div>`;
+};
+const IMGLEG = ['Você tinha reparado nesse detalhe? Comenta aí.', 'Nota de 0 a 10 para esse lugar?', 'Você iria aqui primeiro? Responde nos comentários.', 'Salva para ver depois e marca quem precisa ver isso.', 'O que você faria aqui? Comenta.', 'Isso aqui vai ser o mais disputado. Concorda?'];
 function imgRender() {
   const g = $('#igrid'); if (!g) return;
-  g.innerHTML = S.imgs.slice(0, IMGN).map(([id, n]) => `<article class="vc"><div class="th" style="aspect-ratio:4/5" data-img="${id}"><img loading="lazy" src="${thumb(id, 400)}" alt=""></div><div class="bd" style="padding:9px"><div class="row"><span class="tt" style="min-height:0;font-size:12.5px">${esc(n)}</span><span class="sp"></span><a class="btn btn-p btn-xs" href="${dl(id)}" target="_blank" rel="noopener">Baixar</a></div></div></article>`).join('');
-  $('#imore').classList.toggle('hide', IMGN >= S.imgs.length);
-  $('#imore').onclick = () => { IMGN += 60; imgRender(); };
-  g.onclick = e => { const t = e.target.closest('[data-img]'); if (t) openModal(`<div class="mhead"><b>Imagem</b><button class="x" onclick="document.getElementById('modal').click()">${ic('x')}</button></div><div class="mbody" style="text-align:center"><img src="${thumb(t.dataset.img, 1200)}" alt="" style="margin:0 auto;max-height:70vh;border-radius:14px"><a class="btn btn-p" style="margin-top:14px" href="${dl(t.dataset.img)}" target="_blank" rel="noopener">Baixar original</a></div>`); };
+  const f = IMGFMT[IMGF], list = S.imgs.filter(x => x[2] === IMGF);
+  $('#imgtip').innerHTML = `<div class="row" style="align-items:flex-start"><span class="pill" style="color:var(--aqua)">${f.n}</span><div style="flex:1;min-width:220px"><b style="display:block">Onde usar: ${f.onde}</b><p class="mut" style="font-size:13.5px;margin-top:4px">${f.como}</p></div></div>`;
+  g.style.setProperty('--ar', f.ar);
+  g.classList.toggle('wide', IMGF === 'p');
+  g.innerHTML = list.slice(0, IMGN).map(([id], i) => `<button class="ic2" data-img="${id}" data-i="${i}"><img loading="lazy" src="${thumb(id, IMGF === 'p' ? 640 : 420)}" alt=""></button>`).join('');
+  $('#imore').classList.toggle('hide', IMGN >= list.length);
+  $('#imore').onclick = () => { IMGN += 40; imgRender(); };
+  $('#imgtabs').onclick = e => { const b = e.target.closest('[data-f]'); if (!b) return; IMGF = b.dataset.f; IMGN = 40; $$('#imgtabs button').forEach(x => x.classList.toggle('on', x === b)); imgRender(); };
+  g.onclick = e => {
+    const t = e.target.closest('[data-img]'); if (!t) return;
+    const leg = IMGLEG[+t.dataset.i % IMGLEG.length] + '\n\n' + C.tagsBase.join(' ');
+    openModal(`<div class="mhead"><b>${f.n}</b><button class="x" data-x>${ic('x')}</button></div><div class="mbody"><img src="${thumb(t.dataset.img, 1200)}" alt="" style="margin:0 auto;max-height:60dvh;border-radius:14px"><div class="pv-copy" style="margin-top:14px"><div class="pv-ch"><small>Legenda sugerida</small><button class="btn btn-g btn-s" data-leg>${ic('note')}Copiar</button></div><p class="pre">${esc(leg)}</p></div><a class="btn btn-p" style="margin-top:12px;width:100%;min-height:52px" href="${dl(t.dataset.img)}" target="_blank" rel="noopener">${ic('down')}Baixar imagem</a></div>`);
+    $('#mbox').onclick = ev => { const b = ev.target.closest('button'); if (!b) return; if (b.dataset.x !== undefined) closeModal(); if (b.dataset.leg !== undefined) copy(leg, 'Legenda copiada'); };
+  };
 }
 
 /* ---------- Plano de Golpe (quiz) ---------- */
@@ -845,7 +866,7 @@ V.bonus = () => {
     ['Seus vídeos', [['recarga', 'recarga', 'Recarga Vice City', 'Lote novo toda semana', null], ['ineditos', 'ineditos', 'Cortes Inéditos', 'Só aqui, feitos pelo nosso time', 'ineditos'], ['imagens', 'imagens', 'Imagens para feed', `${fmt(S.imgs.length)} posts prontos`, null]]],
     ['Crescer o canal', [['agenda', 'agenda', 'Gerador Agenda Vice', 'Seu mês em 1 clique', 'agenda'], ['canal', 'canal', 'Canal do Zero', 'Perfil pronto em 1 hora', 'canal'], ['remix', 'remix', 'Kit Remix', `${C.totalGanchos} ganchos + gerador`, 'remix'], ['ferramentas', 'ferramentas', 'Ferramentas', 'Logos, capas e limpeza do arquivo', 'ferramentas']]],
     ['Fazer dinheiro', [['grana', 'grana', 'Mapa da Grana', `${C.rotas.length} formas de monetizar`, 'grana'], ['estrutura', 'estrutura', 'Estrutura de Vendas', 'O nosso funil, aberto para você', 'estrutura']]],
-    ['Extras', [['extra/capas', 'capas', 'Kit Capas', 'Capas que fazem clicar', 'capas'], ['extra/carrossel', 'carrossel', 'Pack Carrossel', '100 carrosséis prontos', 'carrossel'], ['extra/piloto', 'piloto', 'Piloto Automático', 'Robô de Cortes e prompts', 'piloto_lite']]]
+    ['Extras', [['extra/capas', 'capas', 'Kit Capas', 'Capas que fazem clicar', 'capas'], ['extra/carrossel', 'carrossel', 'Pack Carrossel', 'Carrosséis prontos para o feed', 'carrossel'], ['extra/piloto', 'piloto', 'Piloto Automático', 'Robô de Cortes e prompts', 'piloto_lite']]]
   ];
   return `${heroX('login', `${ic('gem')} Seu arsenal`, 'Bônus e', 'extras', 'Tudo o que vem com o Canal Vice City, organizado pelo que você quer fazer agora.', '', '', 'sm eager')}
   ${G.map(([g, it]) => `<section class="sec"><div class="sec-h"><div><h2 class="h2">${g}</h2></div></div><div class="tiles">${it.map(([r, im, n, d, k]) => tile('#/' + r, im, n, d, '', !!k && !can(k))).join('')}</div></section>`).join('')}`;
