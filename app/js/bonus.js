@@ -217,7 +217,7 @@ B.estrutura = () => {
   const ini = load('primeiro', Date.now());
   const libera = ini + CFG.DIAS_ESTRUTURA * 864e5;
   if (Date.now() < libera && !window.CVC_FORCAR_ESTRUTURA) {
-    return `<div class="card lockscreen rv"><div class="big">${ic('funnel')}</div><span class="kick">Bônus 6</span><h2 class="h2" style="margin-top:12px">Estrutura de Vendas Vice City</h2><p class="lead" style="margin:10px auto 0">Esse bônus é liberado ${CFG.DIAS_ESTRUTURA} dias depois do seu primeiro acesso. Até lá, foque em colocar o canal no ar: é ele que vai trazer o público para você vender.</p><div class="countdown" id="cd" data-t="${libera}"></div><a class="btn btn-p" href="#/qg">${ic('rocket')}Voltar para a missão</a></div>`;
+    return hero(`${ic('clock')} Bônus 6 · libera em breve`, 'Estrutura de', 'vendas', `Esse bônus é liberado ${CFG.DIAS_ESTRUTURA} dias depois do seu primeiro acesso. Até lá, foque em colocar o canal no ar: é ele que vai trazer o público para você vender.`, 'estrutura', `<div class="countdown" id="cd" data-t="${libera}" style="justify-content:flex-start"></div><a class="btn btn-p" href="#/rota">${ic('star')}Seguir a Rota Vice City</a>`);
   }
   return hero(`${ic('funnel')} Bônus 6`, 'Estrutura de', 'vendas', 'O mesmo funil que estamos usando para vender o Canal Vice City, aberto para você adaptar ao seu produto e vender para o público do seu canal.', 'estrutura') + `
   <section class="sec"><div class="sec-h"><div><h2 class="h2">O funil em 1 minuto</h2><p>Toque em cada etapa para ver como montamos.</p></div></div>

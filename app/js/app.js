@@ -809,7 +809,7 @@ V.bonus = () => {
 /* ---------- Conta ---------- */
 V.conta = () => {
   const comprados = Object.entries(CFG.produtos).filter(([, p]) => p.libera.every(x => can(x)));
-  return `<h1 class="h1" style="font-size:36px">Sua conta</h1>
+  return `${heroX('login', `${starsHtml(wantedLevel())}&nbsp; Nível ${wantedLevel()} de 6`, 'Sua', 'conta', esc(S.user.email), '', '', 'sm eager')}
   <div class="card sec rv" style="margin-top:16px"><div class="row"><span class="av" style="width:48px;height:48px;font-size:18px">${esc(S.user.email[0].toUpperCase())}</span><div><b>${esc(S.user.email)}</b><div class="dim" style="font-size:13px">Nível ${wantedLevel()} de 6</div></div></div></div>
   <div class="card sec rv"><h3 class="h3">Seus produtos</h3><div style="display:grid;gap:8px;margin-top:12px">${Object.entries(CFG.produtos).map(([k, p]) => { const ok = p.libera.every(x => can(x)); return `<div class="row" style="padding:12px;border-radius:12px;background:rgba(255,255,255,.04)"><span>${ok ? ic('check') : ic('lock')}</span><b>${esc(p.nome)}</b><span class="sp"></span>${ok ? '<span class="pill" style="color:var(--aqua)">Liberado</span>' : `<a class="btn btn-g btn-xs" href="${p.checkout}" target="_blank" rel="noopener">${esc(p.preco)}</a>`}</div>`; }).join('')}</div></div>
   <div class="grid2 sec"><a class="btn btn-g" href="${CFG.SUPORTE_WHATSAPP}" target="_blank" rel="noopener">${ic('chat')}Suporte no WhatsApp</a><button class="btn btn-g" id="sair2">Sair da conta</button></div>`;
