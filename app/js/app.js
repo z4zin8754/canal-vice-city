@@ -8,6 +8,7 @@ const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': 
 const ic = (n, cls = '') => `<svg class="ic ${cls}"><use href="#i-${n}"/></svg>`;
 const STAR = '<svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.2 1.3-6.6-4.9-4.6 6.6-.8z"/></svg>';
 const fmt = n => n.toLocaleString('pt-BR');
+const isoLocal = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 const IMG = k => `assets/img/${k}.webp`;
 const LOGO = 'assets/logo.webp', LOGO_S = 'assets/logo-96.webp';
 const MODO_PREVIA = !CFG.SUPABASE_URL;
@@ -170,6 +171,7 @@ function viewLogin(msg = '') {
 const NAV = [
   ['Comece aqui', [
     ['qg', 'QG', 'app', null],
+    ['hoje', 'Postar hoje', 'clock', null],
     ['rota', 'Rota Vice City', 'star', null],
     ['guia', 'Guia do iniciante', 'note', null]
   ]],
@@ -206,6 +208,7 @@ function shell() {
       ${brand()}
       <nav class="nav">${NAV.map(([g, items]) => `<div class="nav-g">${g}</div>` + items.map(([r, n, i, k]) => `<a href="#/${r}" data-r="${r}">${ic(i)}<span>${n}</span>${r === mr ? '<span class="navstep">Próximo</span>' : lockIc(k)}</a>`).join('')).join('')}</nav>
       <div class="side-foot">
+        ${isStandalone() ? '' : `<button class="btn btn-p btn-s" onclick="instalarApp()" style="width:100%;margin-bottom:6px">${ic('down')}Instalar o app</button>`}
         <a href="${CFG.SUPORTE_WHATSAPP}" target="_blank" rel="noopener" style="display:flex;gap:12px;align-items:center;padding:10px 12px;color:var(--mut);font-weight:650">${ic('chat')}Suporte no WhatsApp</a>
         <a href="#/conta" class="me"><span class="av">${esc((S.user.email || '?')[0].toUpperCase())}</span><div style="min-width:0;flex:1"><div class="em">${esc(S.user.email)}</div><span class="dim" style="font-size:12px;font-weight:700">Minha conta</span></div></a>
       </div>
@@ -226,7 +229,7 @@ function shell() {
     <a href="#/qg" data-r="qg">${ic('app')}QG</a>
     <a href="#/recarga" data-r="recarga">${ic('refresh')}Vídeos</a>
     <a href="#/rota" data-r="rota" class="fab"><span class="o">${STAR}</span>Rota</a>
-    <a href="#/agenda" data-r="agenda">${ic('cal')}Agenda</a>
+    <a href="#/hoje" data-r="hoje">${ic('clock')}Hoje</a>
     <a href="#/bonus" data-r="bonus" id="tabmenu">${ic('gem')}Bônus</a>
   </nav>
   <div class="modal" id="modal"><div class="mbox" id="mbox"></div></div>
@@ -256,8 +259,8 @@ async function logout() {
 }
 
 /* ---------- Modal ---------- */
-function openModal(html) { $('#mbox').innerHTML = html; $('#modal').classList.add('on'); document.body.style.overflow = 'hidden'; }
-function closeModal() { const m = $('#modal'); if (!m?.classList.contains('on')) return; m.classList.remove('on'); document.body.style.overflow = ''; setTimeout(() => { if (!m.classList.contains('on')) $('#mbox').innerHTML = ''; }, 250); }
+function openModal(html) { $('#mbox').className = 'mbox'; $('#mbox').innerHTML = html; $('#modal').classList.add('on'); document.body.style.overflow = 'hidden'; }
+function closeModal() { const m = $('#modal'); if (!m?.classList.contains('on')) return; m.classList.remove('on'); document.body.style.overflow = ''; setTimeout(() => { if (!m.classList.contains('on')) { $('#mbox').innerHTML = ''; $('#mbox').className = 'mbox'; } }, 250); }
 
 /* ---------- Reveal ---------- */
 function reveal() {
@@ -302,38 +305,46 @@ function bindCards(root = document) {
 function openVideo(id, plat = 'tiktok') {
   const v = S.byId[id]; if (!v) return;
   const cat = C.cats[v.cat];
-  const render = p => {
-    const l = legenda(v, p);
-    const done = sets.posted().has(id), fav = sets.fav().has(id);
-    openModal(`<div class="mhead"><span class="pill" style="color:${cat.cor}">${esc(cat.curto)}</span><b>${esc(v.title)}</b><button class="x" data-x>${ic('x')}</button></div>
-    <div class="mbody"><div class="player-wrap">
-      <div class="player"><iframe src="${prev(id)}" allow="autoplay" loading="lazy"></iframe></div>
-      <div>
-        <h3 class="h3">Pronto para postar</h3>
-        <p class="mut" style="font-size:13.5px;margin-top:4px">Escolha a rede e copie título, legenda e hashtags.</p>
-        <div class="ptabs" style="margin-top:12px">${Object.entries(C.plats).map(([k, pl]) => `<button class="chip ${k === p ? 'on' : ''}" data-plat="${k}"><span class="dot" style="background:${pl.cor}"></span>${pl.nome.replace('Instagram ', '').replace('YouTube ', '').replace('Facebook ', 'Face ')}</button>`).join('')}</div>
-        <div style="margin-top:14px"><div class="row"><b style="font-size:13px">Título</b><span class="sp"></span><button class="btn btn-g btn-xs" data-c="t">Copiar</button></div><div class="copybox" style="margin-top:6px">${esc(l.titulo)}</div></div>
-        <div style="margin-top:12px"><div class="row"><b style="font-size:13px">Legenda + hashtags</b><span class="sp"></span><button class="btn btn-g btn-xs" data-c="l">Copiar</button></div><div class="copybox" style="margin-top:6px">${esc(l.texto)}</div></div>
-        <div class="alert" style="color:#bff7f1;background:rgba(34,211,197,.08);border-color:rgba(34,211,197,.25)">${ic('wand')}<span>Para contar como conteúdo original, coloque o gancho como texto na tela ou narre por cima. ${esc(C.plats[p].tamanho)}.</span></div>
-        <div class="row" style="margin-top:16px">
-          <a class="btn btn-p" href="${dl(id)}" target="_blank" rel="noopener" style="flex:1">${ic('play')}Baixar vídeo</a>
-          <button class="btn btn-g" data-m="post">${ic('check')}${done ? 'Postado' : 'Marcar postado'}</button>
-          <button class="btn btn-g" data-m="fav" aria-label="Favoritar">${fav ? '★' : '☆'}</button>
+  let p = plat;
+  const sheet = () => {
+    const l = legenda(v, p), done = sets.posted().has(id), fav = sets.fav().has(id);
+    return `<div class="pv">
+      <div class="pv-top"><button class="pv-back" data-x aria-label="Fechar">${ic('x')}</button><div class="pv-tt"><span style="color:${cat.cor}">${esc(cat.curto)}</span><b>${esc(v.title)}</b></div></div>
+      <div class="pv-grid">
+        <div class="pv-media"><div class="pv-player"><iframe src="${prev(id)}" allow="autoplay; fullscreen" allowfullscreen loading="lazy" title="Vídeo"></iframe></div>
+          <p class="pv-note">${v.mb ? v.mb + ' MB · ' : ''}Toque no play para assistir. Para postar, use o botão Baixar vídeo.</p></div>
+        <div class="pv-side">
+          <div class="pv-step"><span class="n">1</span><div><b>Baixe o vídeo</b><span>Ele vai para a galeria do seu celular.</span></div></div>
+          <a class="btn btn-p pv-dl" href="${dl(id)}" target="_blank" rel="noopener" data-dl>${ic('down')}Baixar vídeo</a>
+          <div class="pv-step"><span class="n">2</span><div><b>Escolha onde vai postar</b><span>A legenda muda para cada rede.</span></div></div>
+          <div class="pv-plats">${Object.entries(C.plats).map(([k, pl]) => `<button class="${k === p ? 'on' : ''}" data-plat="${k}" style="--pc:${pl.cor}">${pl.nome.replace('Instagram ', '').replace('YouTube ', '').replace('Facebook ', 'Face ')}</button>`).join('')}</div>
+          <div class="pv-step"><span class="n">3</span><div><b>Copie e cole na hora de postar</b><span>Coloque o gancho como texto na tela nos 3 primeiros segundos.</span></div></div>
+          <div class="pv-copy"><div class="pv-ch"><small>Gancho para a tela</small><button class="btn btn-g btn-s" data-c="g">${ic('note')}Copiar</button></div><p>${esc(l.gancho)}</p></div>
+          <div class="pv-copy"><div class="pv-ch"><small>Título</small><button class="btn btn-g btn-s" data-c="t">${ic('note')}Copiar</button></div><p>${esc(l.titulo)}</p></div>
+          <div class="pv-copy"><div class="pv-ch"><small>Legenda + hashtags</small><button class="btn btn-g btn-s" data-c="l">${ic('note')}Copiar</button></div><p class="pre">${esc(l.texto)}</p></div>
+          <div class="pv-step"><span class="n">4</span><div><b>Postou? Marque aqui</b><span>Assim a agenda e a sua rota avançam.</span></div></div>
+          <div class="pv-acts"><button class="btn ${done ? 'btn-g' : 'btn-p'}" data-m="post">${ic('check')}${done ? 'Postado' : 'Marcar como postado'}</button><button class="btn btn-g" data-m="fav">${STAR}${fav ? 'Salvo' : 'Salvar'}</button></div>
+          <p class="pv-note">${C.plats[p].tamanho}.</p>
         </div>
-        <p class="note">${v.mb ? v.mb + ' MB · ' : ''}<a href="https://drive.google.com/file/d/${id}/view" target="_blank" rel="noopener" style="text-decoration:underline">abrir no Drive</a></p>
-      </div></div></div>`);
-    $('#mbox').onclick = e => {
-      const b = e.target.closest('button'); if (!b) return;
-      if (b.dataset.x !== undefined) return closeModal();
-      if (b.dataset.plat) return render(b.dataset.plat);
-      if (b.dataset.c === 't') return copy(l.titulo, 'Título copiado');
-      if (b.dataset.c === 'l') return copy(l.texto, 'Legenda copiada');
-      if (b.dataset.m === 'post') { toggleSet('posted', id); refreshStars(); render(p); route(true); }
-      if (b.dataset.m === 'fav') { toggleSet('fav', id); render(p); }
-    };
+      </div></div>`;
   };
-  render(plat);
+  openModal(sheet());
+  $('#mbox').classList.add('pvbox');
+  const rerenderSide = () => { const side = $('.pv-side'); if (!side) return; const tmp = document.createElement('div'); tmp.innerHTML = sheet(); side.replaceWith(tmp.querySelector('.pv-side')); };
+  $('#mbox').onclick = e => {
+    const b = e.target.closest('button,[data-dl]'); if (!b) return;
+    if (b.dataset.x !== undefined) return closeModal();
+    if (b.dataset.dl !== undefined) return toast('Baixando o vídeo. Ele aparece em Downloads ou na galeria.');
+    const l = legenda(v, p);
+    if (b.dataset.plat) { p = b.dataset.plat; return rerenderSide(); }
+    if (b.dataset.c === 'g') return copy(l.gancho, 'Gancho copiado');
+    if (b.dataset.c === 't') return copy(l.titulo, 'Título copiado');
+    if (b.dataset.c === 'l') return copy(l.texto, 'Legenda copiada');
+    if (b.dataset.m === 'post') { const on = toggleSet('posted', id); refreshStars(); toast(on ? 'Marcado como postado. Boa!' : 'Desmarcado'); rerenderSide(); refreshCard(id); }
+    if (b.dataset.m === 'fav') { const on = toggleSet('fav', id); toast(on ? 'Salvo nos favoritos' : 'Removido dos favoritos'); rerenderSide(); refreshCard(id); }
+  };
 }
+function refreshCard(id) { $$(`.vc[data-id="${id}"]`).forEach(c => { c.outerHTML = vcard(S.byId[id]); }); }
 function rail(title, vids, more, sub = '') {
   if (!vids.length) return '';
   return `<section class="rail rv"><div class="rail-h"><h3 class="h3">${title}</h3><span class="ct">${sub || fmt(vids.length) + ' vídeos'}</span>${more ? `<a class="more" href="${more}">Ver tudo ${ic('play')}</a>` : ''}</div>
@@ -368,6 +379,7 @@ V.qg = () => {
   ];
   return `
   ${heroX('qg', `${starsHtml(lv)}&nbsp; Nível ${lv} de 6`, `E aí, ${esc(first)}.`, 'Bem-vindo ao QG', m ? `Sua próxima missão: <b style="color:#fff">${m.n}</b>. Siga a Rota Vice City e cada missão concluída acende uma estrela.` : 'Rota completa. Agora é constância: siga a agenda e escale o que dá resultado.', m ? `<a class="btn btn-p" href="${m.r}">${ic('rocket')}${m.n}</a><a class="btn btn-g" href="#/guia">${ic('note')}Como funciona</a>` : `<a class="btn btn-p" href="#/agenda">${ic('cal')}Abrir minha agenda</a>`, `<img class="logo-big" src="${LOGO}" alt="">`, 'eager')}
+  ${hojeCard()}
   ${m ? `<section class="sec"><div class="sec-h"><div><span class="eyebrow-s">sua próxima missão</span><h2 class="h2">Missão ${nm + 1} de 6</h2></div><a class="btn btn-g btn-s" href="#/rota">Ver a rota completa</a></div>${spot(m, nm)}</section>` : ''}
   <section class="sec"><div class="sec-h"><div><span class="eyebrow-s">rota vice city</span><h2 class="h2">Seu nível de procurado</h2><p>Cada missão concluída acende uma das 6 estrelas.</p></div></div>${track(st, nm)}</section>
   <section class="statrow sec">
@@ -380,6 +392,12 @@ V.qg = () => {
     <div class="tiles">${arsenal.map(([h, im, n, d, k]) => tile(h, im, n, d, '', !can(k) && k !== 'recarga' ? true : (k === 'recarga' && !can('acervo_start')))).join('')}</div></section>
   ${can('recarga') ? rail('Recarga da semana', S.vids.filter(v => v.cat === 'novos'), '#/biblioteca?cat=novos', 'Lote ' + semana) : rail('Cortes que seguram até o fim', vids.filter(v => v.cat === 'cortes'), '#/biblioteca?cat=cortes')}`;
 };
+function hojeCard() {
+  const ag = load('agenda', null); if (!ag) return '';
+  const dia = ag.days.find(d => d.iso === isoLocal()); const ok = load('agdone', {});
+  const n = dia ? dia.posts.length : 0, f = dia ? dia.posts.filter(p => ok[agKey(p)]).length : 0;
+  return `<a class="card glow sec rv" href="#/hoje" style="display:flex;gap:14px;align-items:center"><span class="n" style="width:52px;height:52px;border-radius:16px;display:grid;place-items:center;background:var(--cta);flex:none">${ic('clock')}</span><span style="flex:1"><b style="display:block;font-size:17px">${n ? (f === n ? 'Posts de hoje concluídos' : `Hoje: ${n - f} post${n - f > 1 ? 's' : ''} para fazer`) : 'Hoje é folga na sua agenda'}</b><span class="mut" style="font-size:13.5px">Toque para ver o que postar, onde e em que horário.</span></span>${ic('play')}</a>`;
+}
 function spot(m, i) {
   return `<div class="spot rv"><div class="im"><img src="${IMG(m.img)}" alt="" loading="lazy"><span class="mstar">${STAR} Missão ${i + 1}</span></div><div class="ct"><h3 class="h2" style="font-size:clamp(24px,3vw,32px)">${m.n}</h3><p class="mut">${m.d}</p><ol>${m.passos.map(p => `<li>${esc(p)}</li>`).join('')}</ol><div class="row" style="margin-top:6px"><a class="btn btn-p" href="${m.r}">${ic('play')}Começar agora</a></div></div></div>`;
 }
@@ -614,7 +632,7 @@ V.agenda = (qs) => {
   <section id="agout"></section>`;
 };
 function agDefault(plano) {
-  const d = new Date(); const iso = d.toISOString().slice(0, 10);
+  const iso = isoLocal();
   const plats = {};
   if (plano) { const pl = gerarPlano(plano); pl.plats.forEach(k => plats[k] = Math.min(pl.ppd, C.plats[k].max)); }
   else { plats.tiktok = 2; plats.reels = 2; plats.shorts = 2; }
@@ -676,7 +694,7 @@ function agGerar(cfg) {
   const days = [];
   for (let d = 0; d < 30; d++) {
     const dt = new Date(start); dt.setDate(start.getDate() + d);
-    const iso = dt.toISOString().slice(0, 10);
+    const iso = isoLocal(dt);
     if (!cfg.dias.includes(dt.getDay())) { days.push({ iso, off: true, posts: [] }); continue; }
     const posts = [];
     if (cfg.cross) {
@@ -705,12 +723,12 @@ function agShow(ag) {
   const plats = [...new Set(ag.days.flatMap(d => d.posts.map(p => p.p)))];
   const total = ag.days.reduce((a, d) => a + d.posts.length, 0);
   const vids = new Set(ag.days.flatMap(d => d.posts.map(p => p.id))).size;
-  const today = new Date().toISOString().slice(0, 10);
+  const today = isoLocal();
   const first = new Date(ag.days[0].iso + 'T12:00:00').getDay();
   const mes = new Date(ag.days[0].iso + 'T12:00:00').toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
   out.innerHTML = `
   <div class="sec-h sec"><div><h2 class="h2">Seus 30 dias</h2><p>${fmt(total)} posts · ${fmt(vids)} vídeos diferentes · a partir de ${mes}</p></div>
-    <div class="row"><button class="btn btn-g btn-s" id="agre">${ic('refresh')}Gerar de novo</button><button class="btn btn-g btn-s" id="agics">${ic('cal')}Adicionar ao Google Agenda</button><button class="btn btn-g btn-s" id="agcsv">${ic('note')}Planilha</button></div></div>
+    <div class="row"><a class="btn btn-p btn-s" href="#/hoje">${ic('clock')}Ver o que postar hoje</a><button class="btn btn-g btn-s" id="agre">${ic('refresh')}Gerar de novo</button><button class="btn btn-g btn-s" id="agics">${ic('cal')}Adicionar ao Google Agenda</button><button class="btn btn-g btn-s" id="agcsv">${ic('note')}Planilha</button></div></div>
   <div class="card rv"><div class="row"><div class="legend">${plats.map(p => `<span><i style="background:${C.plats[p].cor}"></i>${C.plats[p].nome}</span>`).join('')}</div><span class="sp"></span><span class="dim" style="font-size:13px;font-weight:700">${agendaProgresso(ag)}% concluído</span></div>
     <div class="prog" style="margin:12px 0 16px"><i style="width:${agendaProgresso(ag)}%"></i></div>
     <div class="cal">${['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'].map(d => `<div class="wd">${d}</div>`).join('')}${'<div></div>'.repeat(first)}${ag.days.map((d, i) => { const dt = new Date(d.iso + 'T12:00:00'); const okc = d.posts.filter(p => ok[agKey(p)]).length; return `<button class="day ${d.off ? 'off' : ''} ${d.iso === today ? 'today' : ''}" data-day="${i}"><span class="dn">${dt.getDate()}${d.posts.length ? `<small>${okc}/${d.posts.length}</small>` : ''}</span>${d.posts.slice(0, 4).map(p => `<span class="slot ${ok[agKey(p)] ? 'ok' : ''}"><i style="background:${C.plats[p.p].cor}"></i>${p.h}</span>`).join('')}${d.posts.length > 4 ? `<span class="dim" style="font-size:11px;font-weight:700">+${d.posts.length - 4}</span>` : ''}</button>`; }).join('')}</div>
@@ -793,6 +811,33 @@ function exportCsv(ag) {
 }
 function baixar(txt, nome, tipo) { const u = URL.createObjectURL(new Blob([txt], { type: tipo + ';charset=utf-8' })); const a = document.createElement('a'); a.href = u; a.download = nome; a.click(); setTimeout(() => URL.revokeObjectURL(u), 1500); }
 
+/* ---------- Hoje: o que postar agora ---------- */
+V.hoje = () => {
+  const ag = load('agenda', null), today = isoLocal();
+  const dia = ag && ag.days.find(d => d.iso === today);
+  const dt = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' });
+  const ok = load('agdone', {});
+  let corpo;
+  if (dia && dia.posts.length) {
+    const feitos = dia.posts.filter(p => ok[agKey(p)]).length;
+    corpo = `<div class="card glow sec rv"><div class="row"><div style="flex:1"><h2 class="h3">${feitos === dia.posts.length ? 'Tudo postado hoje. Missão cumprida!' : `Faltam ${dia.posts.length - feitos} de ${dia.posts.length} posts hoje`}</h2><p class="mut" style="font-size:13.5px;margin-top:4px">Para cada post: baixe, cole o gancho como texto na tela, copie a legenda, poste no horário e toque em Marcar feito.</p></div></div><div class="prog" style="margin-top:12px"><i style="width:${Math.round(feitos / dia.posts.length * 100)}%"></i></div></div>
+    <div id="hojelist" class="sec">${dia.posts.map(p => postRow(p, ok)).join('')}</div>`;
+  } else if (ag) {
+    const prox = ag.days.find(d => d.iso > today && d.posts.length);
+    corpo = `<div class="card sec rv"><h2 class="h3">${ag.days.some(d => d.iso === today) ? 'Hoje é dia de folga na sua agenda.' : 'Sua agenda não cobre hoje.'}</h2><p class="mut" style="margin-top:6px">${prox ? 'Próximo post: ' + new Date(prox.iso + 'T12:00:00').toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: '2-digit' }) + '.' : 'Gere uma agenda nova para os próximos 30 dias.'}</p><a class="btn btn-p" style="margin-top:14px" href="#/agenda">${ic('cal')}Abrir a agenda</a></div>`;
+  } else {
+    const r = rng(hash(today + S.user.email)), posted = sets.posted();
+    const sug = shuffle(allowedVids().filter(v => !posted.has(v.id) && ['cortes', 'memes', 'curiosidades', 'novos', 'ineditos'].includes(v.cat)), r).slice(0, 3);
+    corpo = `<div class="card glow sec rv"><h2 class="h3">Você ainda não tem agenda</h2><p class="mut" style="margin-top:6px">Gere a agenda e esta tela passa a mostrar, todo dia, exatamente o que postar e em que horário. Enquanto isso, separamos 3 vídeos para hoje:</p><a class="btn btn-p" style="margin-top:14px" href="#/agenda">${ic('cal')}Gerar minha agenda (1 minuto)</a></div>
+    <section class="sec"><div class="vgrid">${sug.map(vcard).join('')}</div></section>`;
+  }
+  return `${heroX('agenda', `${ic('clock')} ${dt}`, 'Postar', 'hoje', 'Abra esta tela todo dia. Ela mostra o que postar, onde e em que horário.', '', '', 'sm eager')}${corpo}`;
+};
+function bindHoje() {
+  const l = $('#hojelist'); if (!l) return;
+  l.onclick = e => { const b = e.target.closest('button,[data-open]'); if (!b) return; const ag = load('agenda', null); agPostAction(b, ag); if (b.dataset.ok || b.dataset.sw) route(true); };
+}
+
 /* ---------- Bônus (hub no celular) ---------- */
 V.bonus = () => {
   const G = [
@@ -839,7 +884,7 @@ function route(keepScroll) {
   view.innerHTML = fn(qs, sub) || '';
   $$('[data-r]').forEach(a => { const r = a.dataset.r; a.classList.toggle('on', r === name || r === path || (r === 'bonus' && ['canal', 'grana', 'remix', 'ferramentas', 'estrutura', 'plano', 'extra', 'ineditos', 'imagens', 'bonus', 'guia'].includes(name))); });
   window.__closeSide && window.__closeSide();
-  bindCards(view); bindRails(); bindLib(); bindQuiz(); bindAgenda();
+  bindCards(view); bindRails(); bindLib(); bindQuiz(); bindAgenda(); bindHoje();
   window.BONUS?.bind?.(name, sub, qs);
   const s2 = $('#sair2'); if (s2) s2.onclick = logout;
   if (keepScroll === true) scrollTo(0, y); else if (anchorId) setTimeout(() => document.getElementById(anchorId)?.scrollIntoView({ behavior: 'smooth' }), 80); else if (h !== lastRoute) scrollTo(0, 0);
@@ -896,6 +941,26 @@ function welcome() {
   $('#wlater').onclick = () => { done(); closeModal(); };
 }
 window.addEventListener('hashchange', () => route());
+/* ---------- App instalável ---------- */
+let installEvt = null;
+const isStandalone = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+const isIOS = () => /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; $$('.inst-hide').forEach(x => x.classList.remove('inst-hide')); });
+window.addEventListener('appinstalled', () => { installEvt = null; toast('App instalado. Procure o ícone Vice City na sua tela.'); });
+if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+async function instalarApp() {
+  if (isStandalone()) return toast('Você já está usando o app instalado.');
+  if (installEvt) { installEvt.prompt(); const r = await installEvt.userChoice; installEvt = null; if (r.outcome === 'accepted') toast('Instalando...'); return; }
+  const ios = isIOS();
+  openModal(`<div class="mhead"><b class="disp" style="font-size:20px">Instalar o app Vice City</b><button class="x" data-x>${ic('x')}</button></div><div class="mbody">
+    <div style="display:flex;gap:14px;align-items:center;margin-bottom:16px"><img src="${LOGO_S}" alt="" style="width:64px;height:64px;border-radius:16px;box-shadow:var(--neon)"><p class="mut" style="font-size:14px">Fica na tela inicial como um aplicativo, abre em tela cheia e mais rápido. Não ocupa espaço como app de loja.</p></div>
+    ${ios ? `<h3 class="h3" style="font-size:18px">No iPhone (Safari)</h3><div class="steps3" style="margin-top:10px"><div><span class="n">1</span><span><b>Abra no Safari</b><span>Se estiver em outro navegador, copie o link e abra no Safari.</span></span></div><div><span class="n">2</span><span><b>Toque em Compartilhar</b><span>O quadrado com a seta para cima, na barra de baixo.</span></span></div><div><span class="n">3</span><span><b>Adicionar à Tela de Início</b><span>Role a lista, toque nessa opção e depois em Adicionar.</span></span></div></div>`
+    : `<h3 class="h3" style="font-size:18px">No Android (Chrome)</h3><div class="steps3" style="margin-top:10px"><div><span class="n">1</span><span><b>Abra no Chrome</b><span>Se estiver em outro navegador, copie o link e abra no Chrome.</span></span></div><div><span class="n">2</span><span><b>Toque nos 3 pontinhos</b><span>No canto de cima, à direita.</span></span></div><div><span class="n">3</span><span><b>Instalar app</b><span>Ou "Adicionar à tela inicial". Confirme e pronto.</span></span></div></div>
+    <h3 class="h3" style="font-size:18px;margin-top:18px">No computador</h3><p class="mut" style="font-size:14px;margin-top:6px">No Chrome ou Edge, clique no ícone de instalar no fim da barra de endereço.</p>`}
+    <button class="btn btn-g" style="width:100%;margin-top:18px" id="cplink">${ic('note')}Copiar o link do app</button></div>`);
+  $('#mbox').onclick = e => { const b = e.target.closest('button'); if (!b) return; if (b.dataset.x !== undefined) closeModal(); if (b.id === 'cplink') copy(location.origin + '/app/', 'Link copiado'); };
+}
+window.instalarApp = instalarApp;
 window.CVCAPP = { load, save, can, ic, esc, copy, toast, openModal, closeModal, thumb, dl, lockCard, starsHtml, refreshStars, route, reveal, S };
 boot().catch(e => { console.error(e); document.body.innerHTML = '<p style="padding:40px;font-family:sans-serif;color:#fff">Não foi possível carregar o app. Atualize a página.</p>'; });
 })();

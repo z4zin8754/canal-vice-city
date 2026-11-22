@@ -213,3 +213,54 @@ body::before{background:
 }
 .vc .cvt{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;bottom:40px}
 @media (max-width:560px){.vc .cvt{bottom:36px}}
+
+/* ============ v3 · rolagem estável, player e atalhos ============ */
+html,body{overflow-x:clip}
+body{min-height:100dvh;overscroll-behavior-y:none}
+.shell,.login{min-height:100dvh}
+.mbox{overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.rail-track{scroll-snap-type:x proximity;overscroll-behavior-x:contain}
+.mbox.pvbox{max-width:1080px;padding:0}
+.pv-top{position:sticky;top:0;z-index:3;display:flex;align-items:center;gap:12px;padding:12px 14px;background:rgba(18,9,33,.97);border-bottom:1px solid var(--line)}
+.pv-back{width:42px;height:42px;border-radius:12px;flex:none;display:grid;place-items:center;background:rgba(255,255,255,.08)}
+.pv-tt{min-width:0;display:flex;flex-direction:column;line-height:1.2}
+.pv-tt span{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase}
+.pv-tt b{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pv-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:22px;padding:18px}
+.pv-player{position:relative;width:100%;max-width:400px;margin:0 auto;aspect-ratio:9/16;max-height:72vh;border-radius:18px;overflow:hidden;background:#000;box-shadow:0 0 0 1px rgba(255,47,179,.3)}
+.pv-player iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.pv-note{font-size:12.5px;color:var(--dim);text-align:center;margin-top:10px}
+.pv-side{display:flex;flex-direction:column;gap:12px}
+.pv-step{display:flex;gap:12px;align-items:center;margin-top:6px}
+.pv-step .n{width:30px;height:30px;border-radius:50%;flex:none;display:grid;place-items:center;font-family:var(--disp);font-size:15px;background:var(--cta);box-shadow:0 0 14px rgba(255,47,179,.5)}
+.pv-step b{display:block;font-size:15px;line-height:1.2}
+.pv-step span{font-size:12.5px;color:var(--mut)}
+.pv-dl{width:100%;min-height:54px;font-size:16px}
+.pv-plats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+.pv-plats button{min-height:44px;border-radius:12px;font-size:12.5px;font-weight:800;background:rgba(255,255,255,.05);border:1px solid var(--line2);color:var(--mut);padding:0 4px}
+.pv-plats button.on{background:color-mix(in srgb,var(--pc) 22%,transparent);border-color:var(--pc);color:#fff}
+.pv-copy{border-radius:14px;background:rgba(0,0,0,.28);border:1px solid var(--line);padding:12px}
+.pv-ch{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.pv-ch small{font-size:11.5px;font-weight:800;color:var(--dim);letter-spacing:.06em;text-transform:uppercase;flex:1}
+.pv-ch .btn{min-height:38px;padding:0 14px}
+.pv-copy p{font-size:14px;line-height:1.5;color:#efe6f8}
+.pv-copy p.pre{white-space:pre-wrap;max-height:150px;overflow:auto}
+.pv-acts{display:grid;grid-template-columns:1.6fr 1fr;gap:8px}
+.pv-acts .btn{min-height:50px}
+.pv-acts .btn svg{width:18px;height:18px}
+@media (max-width:980px){
+  html{scroll-behavior:auto}
+  .rv,.rv.in{opacity:1!important;transform:none!important;transition:none!important}
+  .top{backdrop-filter:none;background:#0a0514}
+  .filters{position:static;margin:0;padding:12px 0;background:none;border:0;backdrop-filter:none}
+  .tile:hover,.vc:hover{transform:none}
+  .toc{display:flex;flex-wrap:wrap;overflow:visible;gap:8px;position:static}
+  .toc a{white-space:normal;flex:1 1 calc(50% - 8px);min-height:44px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:13px;background:rgba(255,255,255,.05);border:1px solid var(--line2);color:#fff;border-radius:12px}
+  .modal{align-items:stretch;padding:0}
+  .mbox{max-height:none;height:100%;border-radius:0;border:0}
+  .mbox:not(.pvbox){height:auto;max-height:94dvh;margin-top:auto;border-radius:22px 22px 0 0}
+  .pv-grid{grid-template-columns:1fr;padding:14px 14px calc(24px + env(safe-area-inset-bottom));gap:14px}
+  .pv-player{max-width:none;width:auto;height:58dvh;max-height:58dvh}
+  .pv-plats{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+.pv-acts .btn svg:not(.ic){fill:currentColor}

@@ -1,0 +1,23 @@
+{
+  "name": "Canal Vice City",
+  "short_name": "Vice City",
+  "description": "Seu acervo de cortes de GTA 6, agenda e plano para monetizar.",
+  "id": "/app/",
+  "start_url": "/app/?origem=app",
+  "scope": "/app/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#07030e",
+  "theme_color": "#07030e",
+  "lang": "pt-BR",
+  "icons": [
+    { "src": "assets/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "assets/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "assets/icon-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Postar hoje", "url": "/app/#/hoje", "icons": [{ "src": "assets/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Recarga", "url": "/app/#/recarga", "icons": [{ "src": "assets/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Agenda", "url": "/app/#/agenda", "icons": [{ "src": "assets/icon-192.png", "sizes": "192x192" }] }
+  ]
+}
