@@ -332,3 +332,13 @@ body{min-height:100dvh;overscroll-behavior-y:none}
 .robo-steps .rs p{font-size:13.5px;color:var(--mut);margin:4px 0 8px}
 .robo-steps .rs .btn{min-height:44px}
 .es-demo{margin-top:10px;position:relative;z-index:2}
+/* ajustes do teste de uso */
+.es-panel,.es-box,.es-2>*{min-width:0}
+.es-2 select{width:100%}
+.plat-b [data-pt]{min-height:44px;display:flex;align-items:center}
+@media (max-width:980px){
+  .filters .chips{flex-wrap:wrap;overflow:visible}
+  .dpost .btn-xs{min-height:40px;font-size:12.5px}
+}
+/* bloqueia o botão "abrir no Drive" do player embutido */
+.pv-player::after{content:"";position:absolute;top:0;right:0;width:72px;height:64px;z-index:2}

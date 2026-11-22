@@ -324,9 +324,9 @@ function openVideo(id, plat = 'tiktok') {
           <div class="pv-step"><span class="n">2</span><div><b>Escolha onde vai postar</b><span>A legenda muda para cada rede.</span></div></div>
           <div class="pv-plats">${Object.entries(C.plats).map(([k, pl]) => `<button class="${k === p ? 'on' : ''}" data-plat="${k}" style="--pc:${pl.cor}">${pl.nome.replace('Instagram ', '').replace('YouTube ', '').replace('Facebook ', 'Face ')}</button>`).join('')}</div>
           <div class="pv-step"><span class="n">3</span><div><b>Copie e cole na hora de postar</b><span>Coloque o gancho como texto na tela nos 3 primeiros segundos.</span></div></div>
-          <div class="pv-copy"><div class="pv-ch"><small>Gancho para a tela</small><button class="btn btn-g btn-s" data-c="g">${ic('note')}Copiar</button></div><p>${esc(l.gancho)}</p></div>
-          <div class="pv-copy"><div class="pv-ch"><small>Título</small><button class="btn btn-g btn-s" data-c="t">${ic('note')}Copiar</button></div><p>${esc(l.titulo)}</p></div>
-          <div class="pv-copy"><div class="pv-ch"><small>Legenda + hashtags</small><button class="btn btn-g btn-s" data-c="l">${ic('note')}Copiar</button></div><p class="pre">${esc(l.texto)}</p></div>
+          <div class="pv-copy"><div class="pv-ch"><small>Gancho para a tela</small><button class="btn btn-g btn-s" data-c="g">${ic('copy')}Copiar</button></div><p>${esc(l.gancho)}</p></div>
+          <div class="pv-copy"><div class="pv-ch"><small>Título</small><button class="btn btn-g btn-s" data-c="t">${ic('copy')}Copiar</button></div><p>${esc(l.titulo)}</p></div>
+          <div class="pv-copy"><div class="pv-ch"><small>Legenda + hashtags</small><button class="btn btn-g btn-s" data-c="l">${ic('copy')}Copiar</button></div><p class="pre">${esc(l.texto)}</p></div>
           <div class="pv-step"><span class="n">4</span><div><b>Postou? Marque aqui</b><span>Assim a agenda e a sua rota avançam.</span></div></div>
           <div class="pv-acts"><button class="btn ${done ? 'btn-g' : 'btn-p'}" data-m="post">${ic('check')}${done ? 'Postado' : 'Marcar como postado'}</button><button class="btn btn-g" data-m="fav">${STAR}${fav ? 'Salvo' : 'Salvar'}</button></div>
           <p class="pv-note">${C.plats[p].tamanho}.</p>
@@ -554,7 +554,7 @@ function imgRender() {
   g.onclick = e => {
     const t = e.target.closest('[data-img]'); if (!t) return;
     const leg = IMGLEG[+t.dataset.i % IMGLEG.length] + '\n\n' + C.tagsBase.join(' ');
-    openModal(`<div class="mhead"><b>${f.n}</b><button class="x" data-x>${ic('x')}</button></div><div class="mbody"><img src="${thumb(t.dataset.img, 1200)}" alt="" style="margin:0 auto;max-height:60dvh;border-radius:14px"><div class="pv-copy" style="margin-top:14px"><div class="pv-ch"><small>Legenda sugerida</small><button class="btn btn-g btn-s" data-leg>${ic('note')}Copiar</button></div><p class="pre">${esc(leg)}</p></div><a class="btn btn-p" style="margin-top:12px;width:100%;min-height:52px" href="${dl(t.dataset.img)}" target="_blank" rel="noopener">${ic('down')}Baixar imagem</a></div>`);
+    openModal(`<div class="mhead"><b>${f.n}</b><button class="x" data-x>${ic('x')}</button></div><div class="mbody"><img src="${thumb(t.dataset.img, 1200)}" alt="" style="margin:0 auto;max-height:60dvh;border-radius:14px"><div class="pv-copy" style="margin-top:14px"><div class="pv-ch"><small>Legenda sugerida</small><button class="btn btn-g btn-s" data-leg>${ic('copy')}Copiar</button></div><p class="pre">${esc(leg)}</p></div><a class="btn btn-p" style="margin-top:12px;width:100%;min-height:52px" href="${dl(t.dataset.img)}" target="_blank" rel="noopener">${ic('down')}Baixar imagem</a></div>`);
     $('#mbox').onclick = ev => { const b = ev.target.closest('button'); if (!b) return; if (b.dataset.x !== undefined) closeModal(); if (b.dataset.leg !== undefined) copy(leg, 'Legenda copiada'); };
   };
 }
@@ -1042,7 +1042,7 @@ async function instalarApp() {
     ${ios ? `<h3 class="h3" style="font-size:18px">No iPhone (Safari)</h3><div class="steps3" style="margin-top:10px"><div><span class="n">1</span><span><b>Abra no Safari</b><span>Se estiver em outro navegador, copie o link e abra no Safari.</span></span></div><div><span class="n">2</span><span><b>Toque em Compartilhar</b><span>O quadrado com a seta para cima, na barra de baixo.</span></span></div><div><span class="n">3</span><span><b>Adicionar à Tela de Início</b><span>Role a lista, toque nessa opção e depois em Adicionar.</span></span></div></div>`
     : `<h3 class="h3" style="font-size:18px">No Android (Chrome)</h3><div class="steps3" style="margin-top:10px"><div><span class="n">1</span><span><b>Abra no Chrome</b><span>Se estiver em outro navegador, copie o link e abra no Chrome.</span></span></div><div><span class="n">2</span><span><b>Toque nos 3 pontinhos</b><span>No canto de cima, à direita.</span></span></div><div><span class="n">3</span><span><b>Instalar app</b><span>Ou "Adicionar à tela inicial". Confirme e pronto.</span></span></div></div>
     <h3 class="h3" style="font-size:18px;margin-top:18px">No computador</h3><p class="mut" style="font-size:14px;margin-top:6px">No Chrome ou Edge, clique no ícone de instalar no fim da barra de endereço.</p>`}
-    <button class="btn btn-g" style="width:100%;margin-top:18px" id="cplink">${ic('note')}Copiar o link do app</button></div>`);
+    <button class="btn btn-g" style="width:100%;margin-top:18px" id="cplink">${ic('copy')}Copiar o link do app</button></div>`);
   $('#mbox').onclick = e => { const b = e.target.closest('button'); if (!b) return; if (b.dataset.x !== undefined) closeModal(); if (b.id === 'cplink') copy(location.origin + '/app/', 'Link copiado'); };
 }
 window.instalarApp = instalarApp;
