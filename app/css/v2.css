@@ -211,3 +211,5 @@ body::before{background:
   .tstep .st{width:32px;height:32px}.tstep .st svg{width:28px;height:28px}
   .tstep small{font-size:9.5px}.tstep b{font-size:12px}
 }
+.vc .cvt{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;bottom:40px}
+@media (max-width:560px){.vc .cvt{bottom:36px}}
