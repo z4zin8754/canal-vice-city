@@ -8,6 +8,8 @@ const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': 
 const ic = (n, cls = '') => `<svg class="ic ${cls}"><use href="#i-${n}"/></svg>`;
 const STAR = '<svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.2 1.3-6.6-4.9-4.6 6.6-.8z"/></svg>';
 const fmt = n => n.toLocaleString('pt-BR');
+const IMG = k => `assets/img/${k}.webp`;
+const LOGO = 'assets/logo.webp', LOGO_S = 'assets/logo-96.webp';
 const MODO_PREVIA = !CFG.SUPABASE_URL;
 
 /* ---------- Drive ---------- */
@@ -81,18 +83,27 @@ function legenda(v, plat, seed = 1) {
 }
 
 /* ---------- Ícone/marca ---------- */
-const brand = (sub = true) => `<a class="brand" href="#/qg"><span class="brand-mark">${STAR}</span><span><b>Canal Vice City</b>${sub ? '<small>members only</small>' : ''}</span></a>`;
+const brand = () => `<a class="brand" href="#/qg"><img class="brand-logo" src="${LOGO_S}" alt="Canal Vice City"><span class="bt"><span class="chrome">CANAL</span><span class="brush">Vice City</span></span></a>`;
 
-/* ---------- Estrelas de procurado (progresso) ---------- */
-function wantedLevel() {
-  let n = 1;
-  if (load('plano', null)) n++;
-  if ((load('checks', {}).canal_perfil)) n++;
-  if (load('agenda', null)) n++;
-  if (sets.posted().size > 0) n++;
-  return n;
+/* ---------- Rota Vice City: 6 missões = 6 estrelas ---------- */
+const ROTA = [
+  { id: 'plano', n: 'Monte seu Plano de Golpe', c: 'Plano', img: 'plano', r: '#/plano', d: 'Responda 5 perguntas e receba sua estratégia: redes, posts por dia e o caminho mais curto para a grana.', passos: ['Abra o Plano de Golpe', 'Responda as 5 perguntas (2 minutos)', 'Leia seu roteiro de 4 semanas'], ok: () => !!load('plano', null) },
+  { id: 'canal', n: 'Coloque seu canal no ar', c: 'Canal', img: 'canal', r: '#/canal', d: 'Nome, bio, logo e perfil configurado em cada rede, em menos de 1 hora.', passos: ['Gere o nome do canal', 'Copie a bio pronta da sua rede', 'Crie a logo com o prompt e configure o perfil'], ok: () => !!load('checks', {}).canal_perfil },
+  { id: 'agenda', n: 'Gere sua agenda do mês', c: 'Agenda', img: 'agenda', r: '#/agenda', d: '30 dias com vídeo, rede, horário e legenda prontos. É só seguir.', passos: ['Escolha as redes e quantos posts por dia', 'Toque em Gerar meu mês', 'Exporte para o Google Agenda'], ok: () => !!load('agenda', null) },
+  { id: 'post', n: 'Poste seu primeiro vídeo', c: '1º post', img: 'recarga', r: '#/recarga', d: 'Baixe, transforme com o gancho na tela e publique. O primeiro é o mais importante.', passos: ['Baixe o vídeo do dia', 'Coloque o gancho como texto na tela (Kit Remix)', 'Poste e marque como postado'], ok: () => sets.posted().size > 0 },
+  { id: 'semana', n: 'Feche 7 dias de constância', c: '7 posts', img: 'qg', r: '#/agenda', d: 'O algoritmo aprende quem é seu público com constância. Poste 7 vídeos seguindo a agenda.', passos: ['Siga a agenda todo dia', 'Responda os comentários na primeira hora', 'Repita o formato que mais deu view'], ok: () => sets.posted().size >= 7 },
+  { id: 'grana', n: 'Ative sua primeira fonte de renda', c: 'Grana', img: 'grana', r: '#/grana', d: 'Escolha a rota que já está aberta para você e ative. Tem rota que paga antes de ter muitos seguidores.', passos: ['Abra o Mapa da Grana', 'Veja quais rotas já estão abertas para você', 'Ative uma e marque como feito'], ok: () => !!load('checks', {}).grana_ativa }
+];
+const rotaStatus = () => ROTA.map(m => m.ok());
+function wantedLevel() { return rotaStatus().filter(Boolean).length; }
+const nextMission = () => { const st = rotaStatus(); const i = st.findIndex(x => !x); return i === -1 ? null : i; };
+const starsHtml = (n, cls = '') => `<div class="stars ${cls}" aria-label="Nível ${n} de 6">${[1, 2, 3, 4, 5, 6].map(i => STAR.replace('<svg', `<svg class="${i <= n ? 'on' : ''}"`)).join('')}</div>`;
+
+/* ---------- Hero com imagem ---------- */
+function heroX(img, kick, t1, t2, lead, acts = '', extra = '', cls = '') {
+  return `<section class="hx ${cls} rv"><img class="bg" src="${IMG(img)}" alt="" ${cls.includes('eager') ? '' : 'loading="lazy"'}>${extra}<div class="in">${kick ? `<span class="kick">${kick}</span>` : ''}<h1 style="margin-top:14px"><span class="t1 chrome">${t1}</span><span class="t2 brush">${t2}</span></h1>${lead ? `<p class="lead">${lead}</p>` : ''}${acts ? `<div class="acts">${acts}</div>` : ''}</div></section>`;
 }
-const starsHtml = n => `<div class="stars" aria-label="Nível ${n} de 5">${[1, 2, 3, 4, 5].map(i => STAR.replace('<svg', `<svg class="${i <= n ? 'on' : ''}"`)).join('')}</div>`;
+const tile = (href, img, n, d, tg = '', lock = false) => `<a class="tile rv ${lock ? 'lock' : ''}" href="${href}"><img src="${img.includes('/') ? img : IMG(img)}" alt="" loading="lazy">${lock ? `<span class="tg">${ic('lock')}Bloqueado</span>` : tg ? `<span class="tg">${tg}</span>` : ''}<span class="n">${n}</span>${d ? `<span class="d">${d}</span>` : ''}</a>`;
 
 /* =====================================================================
    LOGIN
@@ -101,17 +112,17 @@ function viewLogin(msg = '') {
   document.body.innerHTML = SPRITE + `
   <div class="login">
     <div class="login-art">
-      <img src="assets/hero.webp" alt="">
+      <img src="${IMG('login')}" alt="">
       <div class="cap rv">
         <span class="kick">${ic('star', 'f')} Área de membros</span>
-        <h1 class="h1" style="margin-top:14px">Bem-vindo a<br><span class="grad">Vice City.</span></h1>
+        <h1 style="margin-top:14px"><span class="chrome disp" style="font-size:clamp(30px,4vw,48px);display:block">Bem-vindo a</span><span class="brush" style="font-size:clamp(46px,6vw,80px)">Vice City</span></h1>
         <p class="lead" style="margin-top:10px">Seu acervo, sua agenda e seu plano para monetizar, tudo num lugar só.</p>
       </div>
     </div>
     <div class="login-box">
       <div class="login-in rv">
-        ${brand()}
-        <h2 class="h2" style="margin-top:28px">Entrar no app</h2>
+        <img class="login-logo" src="${LOGO}" alt="Canal Vice City">
+        <h2 class="h2" style="margin-top:22px">Entrar no app</h2>
         <p class="mut" style="margin-top:6px">Use o e-mail da sua compra.</p>
         ${msg ? `<div class="alert">${ic('bolt')}<span>${esc(msg)}</span></div>` : ''}
         ${MODO_PREVIA ? '' : `<button class="btn gbtn" id="g" style="margin-top:22px"><svg viewBox="0 0 24 24" width="18" height="18"><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.4h6.5a5.6 5.6 0 0 1-2.4 3.6v3h3.9c2.3-2.1 3.5-5.2 3.5-8.7z"/><path fill="#34A853" d="M12 24c3.2 0 6-1.1 8-2.9l-3.9-3c-1.1.7-2.5 1.2-4.1 1.2-3.1 0-5.8-2.1-6.7-5H1.3v3.1A12 12 0 0 0 12 24z"/><path fill="#FBBC05" d="M5.3 14.3a7.2 7.2 0 0 1 0-4.6V6.6H1.3a12 12 0 0 0 0 10.8z"/><path fill="#EA4335" d="M12 4.8c1.8 0 3.4.6 4.6 1.8l3.4-3.4A12 12 0 0 0 1.3 6.6l4 3.1c.9-2.8 3.6-4.9 6.7-4.9z"/></svg>Entrar com Google</button><div class="or">ou</div>`}
@@ -157,20 +168,26 @@ function viewLogin(msg = '') {
    SHELL
    ===================================================================== */
 const NAV = [
-  ['Principal', [
+  ['Comece aqui', [
     ['qg', 'QG', 'app', null],
+    ['rota', 'Rota Vice City', 'star', null],
+    ['guia', 'Guia do iniciante', 'note', null]
+  ]],
+  ['Seus vídeos', [
     ['recarga', 'Recarga Vice City', 'refresh', null],
     ['biblioteca', 'Biblioteca completa', 'film', null],
     ['ineditos', 'Cortes Inéditos', 'gem', 'ineditos'],
-    ['imagens', 'Imagens', 'card', null],
-    ['agenda', 'Gerador Agenda Vice', 'cal', 'agenda']
+    ['imagens', 'Imagens para feed', 'card', null]
   ]],
-  ['Bônus', [
+  ['Crescer o canal', [
     ['plano', 'Plano de Golpe', 'rocket', null],
+    ['agenda', 'Gerador Agenda Vice', 'cal', 'agenda'],
     ['canal', 'Canal do Zero', 'user', 'canal'],
-    ['grana', 'Mapa da Grana', 'coin', 'grana'],
     ['remix', 'Kit Remix', 'wand', 'remix'],
-    ['ferramentas', 'Ferramentas', 'bolt', 'ferramentas'],
+    ['ferramentas', 'Ferramentas', 'bolt', 'ferramentas']
+  ]],
+  ['Fazer dinheiro', [
+    ['grana', 'Mapa da Grana', 'coin', 'grana'],
     ['estrutura', 'Estrutura de Vendas', 'funnel', 'estrutura']
   ]],
   ['Extras', [
@@ -181,44 +198,53 @@ const NAV = [
 ];
 function shell() {
   const lockIc = k => k && !can(k) ? `<svg class="ic lk"><use href="#i-lock"/></svg>` : '';
+  const nm = nextMission(), mr = nm === null ? '' : ROTA[nm].r.slice(2);
   document.body.innerHTML = SPRITE + `
   <div class="shell">
-    <aside class="side">
+    <aside class="side" id="side">
+      <button class="xclose" id="xclose" aria-label="Fechar menu">${ic('x')}</button>
       ${brand()}
-      <nav class="nav">${NAV.map(([g, items]) => `<div class="nav-g">${g}</div>` + items.map(([r, n, i, k]) => `<a href="#/${r}" data-r="${r}">${ic(i)}<span>${n}</span>${lockIc(k)}</a>`).join('')).join('')}</nav>
+      <nav class="nav">${NAV.map(([g, items]) => `<div class="nav-g">${g}</div>` + items.map(([r, n, i, k]) => `<a href="#/${r}" data-r="${r}">${ic(i)}<span>${n}</span>${r === mr ? '<span class="navstep">Próximo</span>' : lockIc(k)}</a>`).join('')).join('')}</nav>
       <div class="side-foot">
-        <a class="nav" href="${CFG.SUPORTE_WHATSAPP}" target="_blank" rel="noopener" style="display:block"><span style="display:flex;gap:12px;align-items:center;padding:10px 12px;color:var(--mut);font-weight:650">${ic('chat')}Suporte no WhatsApp</span></a>
-        <div class="me"><span class="av">${esc((S.user.email || '?')[0].toUpperCase())}</span><div style="min-width:0;flex:1"><div class="em">${esc(S.user.email)}</div><button class="dim" id="sair" style="font-size:12px;font-weight:700">Sair</button></div></div>
+        <a href="${CFG.SUPORTE_WHATSAPP}" target="_blank" rel="noopener" style="display:flex;gap:12px;align-items:center;padding:10px 12px;color:var(--mut);font-weight:650">${ic('chat')}Suporte no WhatsApp</a>
+        <a href="#/conta" class="me"><span class="av">${esc((S.user.email || '?')[0].toUpperCase())}</span><div style="min-width:0;flex:1"><div class="em">${esc(S.user.email)}</div><span class="dim" style="font-size:12px;font-weight:700">Minha conta</span></div></a>
       </div>
     </aside>
+    <div class="scrim" id="scrim"></div>
     <div class="main">
       ${MODO_PREVIA ? `<div class="preview-bar">${ic('bolt')} <b>Modo prévia</b> · simulando a compra: <select id="simp"><option value="completo">Completo</option><option value="start">Start</option><option value="tudo">Completo + bumps + upsell</option></select> · login real entra quando o banco for conectado.</div>` : ''}
       <header class="top">
-        ${brand(false)}
-        <label class="search">${ic('funnel')}<input id="q" type="search" placeholder="Buscar vídeos por nome, categoria ou tema"></label>
-        <div class="wanted" title="Seu nível de procurado sobe a cada etapa concluída"><div class="lbl">Nível de<br>procurado</div><span id="stars"></span></div>
+        <button class="hamb" id="hamb" aria-label="Abrir menu">${ic('menu')}</button>
+        ${brand()}
+        <label class="search">${ic('funnel')}<input id="q" type="search" placeholder="Buscar vídeos por nome, categoria ou criador"></label>
+        <a class="hud" href="#/rota" title="Seu nível de procurado sobe a cada missão da Rota Vice City"><span class="lv"><b>PROCURADO</b><span id="lvn"></span></span><span id="stars"></span></a>
       </header>
       <main class="view" id="view"></main>
     </div>
   </div>
   <nav class="tabbar">
     <a href="#/qg" data-r="qg">${ic('app')}QG</a>
-    <a href="#/recarga" data-r="recarga">${ic('refresh')}Recarga</a>
+    <a href="#/recarga" data-r="recarga">${ic('refresh')}Vídeos</a>
+    <a href="#/rota" data-r="rota" class="fab"><span class="o">${STAR}</span>Rota</a>
     <a href="#/agenda" data-r="agenda">${ic('cal')}Agenda</a>
-    <a href="#/bonus" data-r="bonus">${ic('gem')}Bônus</a>
-    <a href="#/conta" data-r="conta">${ic('user')}Conta</a>
+    <a href="#/bonus" data-r="bonus" id="tabmenu">${ic('gem')}Bônus</a>
   </nav>
   <div class="modal" id="modal"><div class="mbox" id="mbox"></div></div>
   <div class="toast" id="toast"></div>`;
-  $('#sair').onclick = logout;
+  const side = $('#side'), scrim = $('#scrim');
+  const openSide = on => { side.classList.toggle('open', on); scrim.classList.toggle('on', on); document.body.style.overflow = on ? 'hidden' : ''; };
+  $('#hamb').onclick = () => openSide(true);
+  $('#xclose').onclick = scrim.onclick = () => openSide(false);
+  side.addEventListener('click', e => { if (e.target.closest('a')) openSide(false); });
+  window.__closeSide = () => openSide(false);
   const simp = $('#simp');
   if (simp) { simp.value = S.previewPlan; simp.onchange = () => { S.previewPlan = simp.value; localStorage.setItem('cvc:simp', simp.value); setPreviewAccess(); shell(); route(); }; }
   $('#q').addEventListener('keydown', e => { if (e.key === 'Enter') location.hash = '#/biblioteca?q=' + encodeURIComponent(e.target.value.trim()); });
   $('#modal').addEventListener('click', e => { if (e.target.id === 'modal') closeModal(); });
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); openSide(false); } });
   refreshStars();
 }
-function refreshStars() { const el = $('#stars'); if (el) el.innerHTML = starsHtml(wantedLevel()); }
+function refreshStars() { const el = $('#stars'), lv = wantedLevel(); if (el) el.innerHTML = starsHtml(lv); const n = $('#lvn'); if (n) n.textContent = `NÍVEL ${lv}/6`; }
 function setPreviewAccess() {
   const p = S.previewPlan;
   applyPlan(p === 'tudo' ? ['completo', 'capas', 'carrossel', 'piloto'] : [p]);
@@ -248,14 +274,20 @@ function vcard(v) {
   const fav = sets.fav().has(v.id), done = sets.posted().has(v.id), cat = C.cats[v.cat];
   return `<article class="vc" data-id="${v.id}">
     <div class="th" data-open="${v.id}"><img loading="lazy" src="${thumb(v.id)}" alt="" onerror="this.style.opacity=0"><span class="play"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></span>
-      <span class="tag" style="color:${cat.cor}">${esc(cat.curto)}</span>
+      <img class="cvb" src="${LOGO_S}" alt=""><span class="cvt">${esc(capaTxt(v))}</span><span class="tag" style="color:${cat.cor}">${esc(cat.curto)}</span>
       <button class="fav ${fav ? 'on' : ''}" data-fav="${v.id}" aria-label="Favoritar">${STAR}</button>
       ${done ? '<span class="done-b">Postado</span>' : ''}</div>
-    <div class="bd"><div class="tt">${esc(v.title)}</div>
+    <div class="bd"><div class="tt">${esc(v.title)}${v.cat === 'ineditos' || v.cat === 'novos' ? '' : ''}</div>
       <div class="acts"><a class="btn btn-p" href="${dl(v.id)}" target="_blank" rel="noopener">${ic('play')}Baixar</a>
       <button class="btn btn-g ib cp" data-copy="${v.id}" title="Copiar legenda e tags">${ic('tag')}</button>
       <button class="btn btn-g ib" data-post="${v.id}" title="Marcar como postado">${ic('check')}</button></div></div>
   </article>`;
+}
+function capaTxt(v) {
+  if (v.cat === 'ineditos') return v.raw;
+  if (v.cat === 'novos') return C.temas[v.tema] || 'Novo';
+  const g = C.ganchos[C.ganchosPorCat[v.cat] || 'corte'];
+  return g[hash(v.id) % g.length].replace(/[.?!]+$/, '');
 }
 function bindCards(root = document) {
   root.onclick = e => {
@@ -310,9 +342,9 @@ function rail(title, vids, more, sub = '') {
 function bindRails() {
   $$('.rail-btn').forEach(b => b.onclick = () => { const tr = b.parentElement.querySelector('.rail-track'); tr.scrollBy({ left: tr.clientWidth * .9 * b.dataset.sc, behavior: 'smooth' }); });
 }
-function lockCard(k, txt) {
+function lockCard(k, txt, img = 'estrutura') {
   const p = Object.entries(CFG.produtos).find(([, v]) => v.libera.includes(k));
-  return `<div class="card lockscreen rv"><div class="big">${ic('lock')}</div><h2 class="h2">Área bloqueada</h2><p class="lead" style="margin:10px auto 0">${txt || 'Este conteúdo faz parte de outro plano.'}</p>${p ? `<a class="btn btn-p" style="margin-top:22px" href="${p[1].checkout}" target="_blank" rel="noopener">${ic('bolt')}Liberar ${esc(p[1].nome)} · ${esc(p[1].preco)}</a>` : ''}</div>`;
+  return `<section class="hx sm rv" style="min-height:320px"><img class="bg" src="${IMG(img)}" alt="" style="filter:grayscale(.6) brightness(.6)"><div class="in"><span class="kick" style="color:var(--gold);border-color:rgba(255,209,102,.4)">${ic('lock')} Área bloqueada</span><h1 style="margin-top:14px"><span class="t1 chrome">Esse cofre</span><span class="t2 brush">está trancado</span></h1><p class="lead">${txt || 'Este conteúdo faz parte de outro plano.'}</p>${p ? `<div class="acts"><a class="btn btn-p" href="${p[1].checkout}" target="_blank" rel="noopener">${ic('bolt')}Liberar ${esc(p[1].nome)} · ${esc(p[1].preco)}</a></div>` : ''}</div></section>`;
 }
 
 /* =====================================================================
@@ -322,81 +354,85 @@ const V = {};
 
 /* ---------- QG ---------- */
 V.qg = () => {
-  const plano = load('plano', null), ag = load('agenda', null), posted = sets.posted(), lv = wantedLevel();
-  const vids = allowedVids();
-  const first = (S.user.email || '').split('@')[0];
-  const passos = [
-    ['Monte seu Plano de Golpe', 'Responda 5 perguntas e receba a estratégia pronta.', '#/plano', !!plano],
-    ['Crie seu canal', 'Nome, bio, logo com IA e perfil configurado.', '#/canal', !!load('checks', {}).canal_perfil],
-    ['Gere sua agenda do mês', 'Vídeo, dia e horário para cada rede.', '#/agenda', !!ag],
-    ['Poste o primeiro vídeo', 'Baixe, copie a legenda e marque como postado.', '#/recarga', posted.size > 0]
-  ];
-  const cur = passos.findIndex(p => !p[3]);
-  const semana = recargaSemana();
-  const mods = [
-    ['recarga', 'Recarga Vice City', `Semana ${semana} de ${CFG.RECARGA_SEMANAS} liberada`, 'refresh', 'recarga', '#ff2d7a'],
-    ['agenda', 'Gerador Agenda Vice', 'Seu mês montado em 1 clique', 'cal', 'agenda', '#22d3c5'],
-    ['canal', 'Canal do Zero', 'Perfil pronto em menos de 1 hora', 'user', 'canal', '#ffc861'],
-    ['grana', 'Mapa da Grana', `${C.rotas.length} formas de monetizar`, 'coin', 'grana', '#4ade80'],
-    ['remix', 'Kit Remix', `${C.totalGanchos} ganchos + gerador`, 'wand', 'remix', '#a78bfa'],
-    ['estrutura', 'Estrutura de Vendas', 'O nosso funil, aberto para você', 'funnel', 'estrutura', '#ff8a3d']
+  const ag = load('agenda', null), posted = sets.posted(), lv = wantedLevel(), st = rotaStatus(), nm = nextMission();
+  const vids = allowedVids(), semana = recargaSemana();
+  const first = (S.user.email || '').split('@')[0].split(/[._-]/)[0];
+  const m = nm === null ? null : ROTA[nm];
+  const arsenal = [
+    ['#/recarga', 'recarga', 'Recarga Vice City', `Semana ${semana} de ${CFG.RECARGA_SEMANAS} · ${fmt(vids.length)} vídeos`, 'recarga'],
+    ['#/agenda', 'agenda', 'Gerador Agenda Vice', 'Seu mês inteiro montado em 1 clique', 'agenda'],
+    ['#/ineditos', 'ineditos', 'Cortes Inéditos', 'Feitos pelo nosso time, só aqui', 'ineditos'],
+    ['#/canal', 'canal', 'Canal do Zero', 'Perfil pronto em menos de 1 hora', 'canal'],
+    ['#/remix', 'remix', 'Kit Remix', `${C.totalGanchos} ganchos e gerador de legendas`, 'remix'],
+    ['#/grana', 'grana', 'Mapa da Grana', `${C.rotas.length} formas de monetizar`, 'grana']
   ];
   return `
-  <section class="qg-hero">
-    <div class="hero art-sunset rv" style="min-height:300px"><span class="sun"></span>
-      <div class="in"><span class="kick">${starsHtml(lv)} Nível ${lv} de 5</span>
-        <h1 class="h1">E aí, ${esc(first)}.<br><span class="script" style="font-size:.8em">bem-vindo ao QG</span></h1>
-        <p class="lead">${cur === -1 ? 'Seu canal está rodando. Agora é constância: siga a agenda e acompanhe o Mapa da Grana.' : 'Siga os passos ao lado e saia hoje com o canal criado e o mês agendado.'}</p>
-        <div class="row" style="margin-top:16px"><a class="btn btn-p" href="${cur === -1 ? '#/agenda' : passos[cur][2]}">${ic('rocket')}${cur === -1 ? 'Abrir minha agenda' : passos[cur][0]}</a><a class="btn btn-g" href="#/recarga">${ic('refresh')}Ver a Recarga</a></div>
-      </div>
-    </div>
-    <div class="card rv"><div class="row"><h3 class="h3">Sua missão</h3><span class="sp"></span><span class="pill">${passos.filter(p => p[3]).length}/4</span></div>
-      <div style="display:grid;gap:10px;margin-top:14px">${passos.map((p, i) => `<a class="next ${p[3] ? 'done' : ''} ${i === cur ? 'cur' : ''}" href="${p[2]}"><span class="num">${p[3] ? ic('check') : i + 1}</span><span><b style="display:block">${p[0]}</b><span class="mut" style="font-size:13px">${p[1]}</span></span></a>`).join('')}</div>
-    </div>
-  </section>
-  <section class="grid4 sec" style="margin-top:18px">
-    <div class="statc rv"><b class="grad">${fmt(vids.length)}</b><span>vídeos liberados para você</span></div>
+  ${heroX('qg', `${starsHtml(lv)}&nbsp; Nível ${lv} de 6`, `E aí, ${esc(first)}.`, 'Bem-vindo ao QG', m ? `Sua próxima missão: <b style="color:#fff">${m.n}</b>. Siga a Rota Vice City e cada missão concluída acende uma estrela.` : 'Rota completa. Agora é constância: siga a agenda e escale o que dá resultado.', m ? `<a class="btn btn-p" href="${m.r}">${ic('rocket')}${m.n}</a><a class="btn btn-g" href="#/guia">${ic('note')}Como funciona</a>` : `<a class="btn btn-p" href="#/agenda">${ic('cal')}Abrir minha agenda</a>`, `<img class="logo-big" src="${LOGO}" alt="">`, 'eager')}
+  ${m ? `<section class="sec"><div class="sec-h"><div><span class="eyebrow-s">sua próxima missão</span><h2 class="h2">Missão ${nm + 1} de 6</h2></div><a class="btn btn-g btn-s" href="#/rota">Ver a rota completa</a></div>${spot(m, nm)}</section>` : ''}
+  <section class="sec"><div class="sec-h"><div><span class="eyebrow-s">rota vice city</span><h2 class="h2">Seu nível de procurado</h2><p>Cada missão concluída acende uma das 6 estrelas.</p></div></div>${track(st, nm)}</section>
+  <section class="statrow sec">
+    <div class="statc rv"><b class="grad">${fmt(vids.length)}</b><span>vídeos liberados</span></div>
     <div class="statc rv"><b>${fmt(posted.size)}</b><span>vídeos postados</span></div>
-    <div class="statc rv"><b>${ag ? agendaProgresso(ag) + '%' : '—'}</b><span>da agenda do mês</span></div>
+    <div class="statc rv"><b>${ag ? agendaProgresso(ag) + '%' : '0%'}</b><span>da agenda do mês</span></div>
     <div class="statc rv"><b>${semana}/${CFG.RECARGA_SEMANAS}</b><span>semanas de recarga</span></div>
   </section>
-  ${plano ? planoResumo(plano) : `<section class="card glow sec rv" style="display:flex;gap:18px;align-items:center;flex-wrap:wrap"><div style="flex:1;min-width:240px"><span class="kick">${ic('rocket')} Comece por aqui</span><h2 class="h2" style="margin-top:10px">Monte seu Plano de Golpe</h2><p class="mut" style="margin-top:6px">5 perguntas rápidas e você recebe a estratégia pronta: onde postar, quantos posts por dia, o que postar e qual o caminho mais rápido para monetizar.</p></div><a class="btn btn-p" href="#/plano">${ic('play')}Começar agora</a></section>`}
-  <section class="sec"><div class="sec-h"><div><h2 class="h2">Seu arsenal</h2><p>Tudo o que veio no seu plano.</p></div></div>
-    <div class="grid3">${mods.map(([r, n, d, i, k, c]) => `<a class="modc rv ${can(k) ? '' : 'lock'}" href="#/${r}" style="background:linear-gradient(160deg,color-mix(in srgb,${c} 22%,#24133f),#170c2c)">${can(k) ? '' : `<span class="lockb">${ic('lock')} Bloqueado</span>`}<span class="ico" style="color:${c}">${ic(i)}</span><span class="n">${n}</span><span class="d">${d}</span></a>`).join('')}</div>
-  </section>
-  ${can('recarga') ? rail('Recarga da semana', S.vids.filter(v => v.cat === 'novos'), '#/biblioteca?cat=novos', 'Lote ' + semana) : ''}
-  ${can('ineditos') ? rail('Cortes Inéditos', S.vids.filter(v => v.cat === 'ineditos'), '#/ineditos', 'Só aqui') : ''}
-  ${rail('Cortes que seguram até o fim', vids.filter(v => v.cat === 'cortes'), '#/biblioteca?cat=cortes')}
-  ${rail('Memes para viralizar', vids.filter(v => v.cat === 'memes'), '#/biblioteca?cat=memes')}`;
+  <section class="sec"><div class="sec-h"><div><span class="eyebrow-s">seu arsenal</span><h2 class="h2">Tudo o que veio no seu plano</h2></div><a class="btn btn-g btn-s" href="#/bonus">Ver todos os bônus</a></div>
+    <div class="tiles">${arsenal.map(([h, im, n, d, k]) => tile(h, im, n, d, '', !can(k) && k !== 'recarga' ? true : (k === 'recarga' && !can('acervo_start')))).join('')}</div></section>
+  ${can('recarga') ? rail('Recarga da semana', S.vids.filter(v => v.cat === 'novos'), '#/biblioteca?cat=novos', 'Lote ' + semana) : rail('Cortes que seguram até o fim', vids.filter(v => v.cat === 'cortes'), '#/biblioteca?cat=cortes')}`;
 };
+function spot(m, i) {
+  return `<div class="spot rv"><div class="im"><img src="${IMG(m.img)}" alt="" loading="lazy"><span class="mstar">${STAR} Missão ${i + 1}</span></div><div class="ct"><h3 class="h2" style="font-size:clamp(24px,3vw,32px)">${m.n}</h3><p class="mut">${m.d}</p><ol>${m.passos.map(p => `<li>${esc(p)}</li>`).join('')}</ol><div class="row" style="margin-top:6px"><a class="btn btn-p" href="${m.r}">${ic('play')}Começar agora</a></div></div></div>`;
+}
+function track(st, nm) {
+  return `<div class="track">${ROTA.map((m, i) => `<a class="tstep rv ${st[i] ? 'done' : ''} ${i === nm ? 'cur' : ''}" href="${m.r}"><span class="st">${STAR}</span><small>${st[i] ? 'Concluída' : i === nm ? 'Agora' : 'Missão ' + (i + 1)}</small><b>${m.c}</b></a>`).join('')}</div>`;
+}
 function recargaSemana() {
   const fl = load('primeiro', Date.now());
   return Math.min(CFG.RECARGA_SEMANAS, 1 + Math.floor((Date.now() - fl) / (7 * 864e5)));
 }
-function planoResumo(p) {
-  const pl = gerarPlano(p);
-  return `<section class="card glow sec rv"><div class="row"><span class="kick">${ic('rocket')} Seu Plano de Golpe</span><span class="sp"></span><a class="btn btn-g btn-s" href="#/plano/ver">Ver plano completo</a></div>
-  <h2 class="h2" style="margin-top:12px">${esc(pl.nome)}</h2><p class="mut" style="margin-top:6px">${esc(pl.resumo)}</p>
-  <div class="grid3" style="margin-top:16px">${pl.kpis.map(k => `<div class="statc"><b style="font-size:24px">${esc(k[0])}</b><span>${esc(k[1])}</span></div>`).join('')}</div></section>`;
-}
+
+/* ---------- Rota Vice City ---------- */
+V.rota = () => {
+  const st = rotaStatus(), nm = nextMission(), lv = wantedLevel();
+  return `${heroX('plano', `${starsHtml(lv)}&nbsp; Nível ${lv} de 6`, 'Rota', 'Vice City', 'O caminho exato, do zero até a primeira grana. São 6 missões; cada uma acende uma estrela de procurado. Faça na ordem.', nm !== null ? `<a class="btn btn-p" href="${ROTA[nm].r}">${ic('rocket')}Ir para a missão ${nm + 1}</a>` : '', '', 'eager')}
+  <section class="sec">${track(st, nm)}</section>
+  <section class="sec" style="display:grid;gap:18px">${ROTA.map((m, i) => `<div style="${st[i] ? 'opacity:.72' : ''}">${spot(m, i).replace('Começar agora', st[i] ? 'Rever' : i === nm ? 'Começar agora' : 'Abrir')}</div>`).join('')}</section>
+  <p class="note sec">Os resultados dependem da sua constância. Nenhuma plataforma garante audiência ou renda: a rota mostra o caminho mais curto, e você caminha.</p>`;
+};
+
+/* ---------- Guia do iniciante ---------- */
+const GUIA = [
+  ['Por onde eu começo?', `<p>Siga a <a href="#/rota" style="text-decoration:underline">Rota Vice City</a>: são 6 missões em ordem. Em uma tarde você sai com o plano, o canal criado e o mês agendado.</p>`],
+  ['Como baixar os vídeos no celular?', `<ol><li>Toque no vídeo e depois em <b>Baixar vídeo</b>.</li><li><b>Android:</b> o arquivo vai para a pasta Downloads e aparece na galeria.</li><li><b>iPhone:</b> toque no ícone de compartilhar e em <b>Salvar vídeo</b>. Se abrir em Arquivos, toque e segure e escolha <b>Salvar no Fotos</b>.</li><li>Vídeo grande demora um pouco mais: use o Wi-Fi.</li></ol>`],
+  ['Por que eu preciso transformar o corte?', `<p>YouTube, TikTok e Instagram não pagam por vídeo repostado igual ao de outros perfis. Eles pagam por conteúdo com a sua contribuição. Na prática, 1 minuto de edição resolve:</p><ol><li><b>Gancho na tela:</b> texto grande nos 3 primeiros segundos (use o Kit Remix).</li><li><b>Legenda própria</b> e título com o que acontece no vídeo.</li><li><b>Narração</b> por cima, contando o que a pessoa vai ver, ou <b>sua reação</b> no canto (react).</li><li><b>Corte o começo parado</b> e dê zoom no momento principal.</li></ol>`],
+  ['Como colocar o texto na tela pelo celular?', `<ol><li>Abra o CapCut e toque em <b>Novo projeto</b>.</li><li>Escolha o vídeo baixado.</li><li>Toque em <b>Texto → Adicionar texto</b>, cole o gancho e coloque no terço de cima.</li><li>Use letra grossa, branca com contorno preto, e deixe na tela nos 3 primeiros segundos.</li><li>Exporte em 1080p e poste.</li></ol>`],
+  ['Posso postar o mesmo vídeo em várias redes?', `<p>Pode, e é o jeito mais rápido de crescer. Só nunca poste com a marca d'água de outra rede (vídeo baixado do TikTok no Reels, por exemplo): isso derruba o alcance. Use sempre o arquivo baixado daqui.</p>`],
+  ['Preciso aquecer a conta nova?', `<p>Ajuda. Nos 2 ou 3 primeiros dias (5 a 7 no Instagram), use a conta como uma pessoa normal: siga perfis de GTA, assista, curta e comente por uns 10 minutos antes de postar. Assim a rede entende o seu nicho.</p>`],
+  ['Quantos posts por dia e em que horário?', `<p>O <a href="#/plano" style="text-decoration:underline">Plano de Golpe</a> calcula para você. Em geral: 2 a 3 por dia por rede no começo, nos horários da agenda (almoço, fim de tarde e noite). Depois de 2 semanas, ajuste pelo painel de cada rede.</p>`],
+  ['Quanto tempo até monetizar?', `<p>Depende da rota. Algumas pagam antes de ter muitos seguidores (campanhas de cortes, serviço para streamers, afiliados); as recompensas das plataformas pedem metas maiores. No YouTube, a partir de 1º de fevereiro de 2027 a entrada passa a pedir mais visualizações. Veja os requisitos atualizados no <a href="#/grana" style="text-decoration:underline">Mapa da Grana</a>.</p>`],
+  ['Meu vídeo foi bloqueado ou recebeu reivindicação. E agora?', `<ol><li>Não apague a conta nem entre em pânico: reivindicação de música costuma só limitar o vídeo.</li><li>Evite trechos com a rádio do jogo tocando alto.</li><li>Evite spoiler da história e cenas de cinema longas.</li><li>Se repetir, troque o vídeo pela mesma categoria na Recarga.</li></ol>`],
+  ['O que fazer quando um vídeo bomba?', `<p>Poste mais do mesmo tipo nos dias seguintes, teste 2 ganchos novos no mesmo assunto e fixe esse vídeo no topo do perfil. É assim que o canal cresce rápido.</p>`]
+];
+V.guia = () => `${heroX('canal', `${ic('note')} Comece aqui`, 'Guia do', 'iniciante', 'Respostas rápidas para as dúvidas de quem está postando pela primeira vez.', `<a class="btn btn-p" href="#/rota">${ic('star')}Seguir a Rota Vice City</a>`, '', 'eager')}
+  <section class="sec"><div class="sec-h"><div><span class="eyebrow-s">o ciclo de todo dia</span><h2 class="h2">Do app para o post em 3 passos</h2></div></div>
+  <div class="steps3"><div><span class="n">1</span><span><b>Escolha e baixe</b><span>Pegue o vídeo do dia na agenda ou na Recarga.</span></span></div><div><span class="n">2</span><span><b>Transforme</b><span>Gancho na tela e legenda própria. Leva 1 minuto.</span></span></div><div><span class="n">3</span><span><b>Poste e marque</b><span>Publique no horário e marque como postado aqui.</span></span></div></div></section>
+  <section class="sec"><div class="sec-h"><div><span class="eyebrow-s">dúvidas frequentes</span><h2 class="h2">Perguntas de quem está começando</h2></div></div>
+  <div class="faq">${GUIA.map(([q, a], i) => `<details class="rv" ${i < 1 ? 'open' : ''}><summary>${esc(q)}</summary><div class="fa">${a}</div></details>`).join('')}</div></section>
+  <section class="card glow sec rv" style="display:flex;gap:16px;align-items:center;flex-wrap:wrap"><div style="flex:1;min-width:220px"><h3 class="h3">Ainda ficou com dúvida?</h3><p class="mut" style="margin-top:6px">Fale com o nosso suporte no WhatsApp.</p></div><a class="btn btn-g" href="${CFG.SUPORTE_WHATSAPP}" target="_blank" rel="noopener">${ic('chat')}Chamar no WhatsApp</a></section>`;
 
 /* ---------- Recarga ---------- */
+const ORDER = ['novos', 'ineditos', 'cortes', 'memes', 'curiosidades', 'teorias', 'reacts', 'clipes', 'vazamentos', 'trailers', 'comparacoes', 'longos', 'geral'];
 V.recarga = () => {
-  const vids = allowedVids();
-  const semana = recargaSemana();
-  const order = ['novos', 'ineditos', 'cortes', 'memes', 'curiosidades', 'teorias', 'reacts', 'clipes', 'vazamentos', 'trailers', 'comparacoes', 'longos', 'geral'];
+  const vids = allowedVids(), semana = recargaSemana();
   const cnt = c => S.vids.filter(v => v.cat === c && vidAllowed(v)).length;
-  const sample = c => S.vids.find(v => v.cat === c);
+  const sample = c => { const a = S.vids.filter(v => v.cat === c); return a[hash(c) % a.length]; };
   return `
-  <section class="hero rv" style="min-height:280px"><img class="bg" src="assets/hero.webp" alt="" style="object-position:center 25%;opacity:.55">
-    <div class="in"><span class="kick">${ic('refresh')} Recarga semana ${semana} de ${CFG.RECARGA_SEMANAS}</span>
-      <h1 class="h1">Recarga<br><span class="grad">Vice City</span></h1>
-      <p class="lead">${fmt(vids.length)} vídeos prontos, separados por categoria. Toque para assistir, baixe e copie a legenda pronta. Lote novo toda semana.</p>
-      <div class="row" style="margin-top:14px"><a class="btn btn-p" href="#/biblioteca">${ic('film')}Abrir biblioteca completa</a>${can('agenda') ? `<a class="btn btn-g" href="#/agenda">${ic('cal')}Montar agenda com esses vídeos</a>` : ''}</div></div></section>
-  ${!can('acervo') ? `<div class="alert" style="margin-top:16px">${ic('lock')}<span>Seu plano Start libera ${fmt(vids.length)} vídeos. O Completo libera os ${fmt(S.vids.length)} vídeos, a Recarga semanal e os Cortes Inéditos. <a href="${CFG.produtos.completo.checkout}" style="text-decoration:underline;font-weight:800">Fazer upgrade</a></span></div>` : ''}
-  <section class="sec"><div class="sec-h"><div><h2 class="h2">Categorias</h2><p>Escolha o que postar hoje.</p></div></div>
-  <div class="grid4">${order.filter(c => S.vids.some(v => v.cat === c)).map(c => { const n = cnt(c), s = sample(c), lk = n === 0; return `<a class="catc rv" href="${lk ? '#/recarga' : '#/biblioteca?cat=' + c}" ${lk ? 'style="opacity:.55"' : ''}><img class="bgi" loading="lazy" src="${s ? thumb(s.id, 400) : ''}" alt=""><span class="bar" style="background:${C.cats[c].cor}"></span><span class="n">${C.cats[c].nome}</span><span class="c">${lk ? 'Bloqueado no seu plano' : fmt(n) + ' vídeos'}</span></a>`; }).join('')}</div></section>
-  ${order.filter(c => c !== 'geral').map(c => rail(C.cats[c].nome, vids.filter(v => v.cat === c), '#/biblioteca?cat=' + c)).join('')}
+  ${heroX('recarga', `${ic('refresh')} Semana ${semana} de ${CFG.RECARGA_SEMANAS}`, 'Recarga', 'Vice City', `${fmt(vids.length)} vídeos prontos, separados por categoria e criador. Lote novo toda semana.`, `<a class="btn btn-p" href="#/biblioteca">${ic('film')}Abrir a biblioteca</a>${can('agenda') ? `<a class="btn btn-g" href="#/agenda">${ic('cal')}Montar minha agenda</a>` : ''}`, '', 'eager')}
+  ${!can('acervo') ? `<div class="alert" style="margin-top:16px">${ic('lock')}<span>Seu plano Start libera ${fmt(vids.length)} vídeos. O Completo libera os ${fmt(S.vids.length)}, a Recarga semanal e os Cortes Inéditos. <a href="${CFG.produtos.completo.checkout}" style="text-decoration:underline;font-weight:800">Fazer upgrade</a></span></div>` : ''}
+  <section class="sec"><div class="steps3"><div><span class="n">1</span><span><b>Toque no vídeo</b><span>Assista aqui mesmo, sem abrir o Drive.</span></span></div><div><span class="n">2</span><span><b>Baixe e transforme</b><span>Coloque o gancho na tela (veja o Guia).</span></span></div><div><span class="n">3</span><span><b>Copie a legenda</b><span>Título e hashtags prontos para cada rede.</span></span></div></div></section>
+  <section class="sec"><div class="sec-h"><div><span class="eyebrow-s">escolha o que postar hoje</span><h2 class="h2">Categorias</h2></div></div>
+  <div class="tiles">${ORDER.filter(c => S.vids.some(v => v.cat === c)).map(c => { const n = cnt(c), s = sample(c); return tile(n ? '#/biblioteca?cat=' + c : '#/recarga', s ? thumb(s.id, 500) : IMG('biblioteca'), C.cats[c].nome, n ? fmt(n) + ' vídeos' : 'Não incluso no seu plano', `<span class="dot" style="width:8px;height:8px;border-radius:50%;background:${C.cats[c].cor}"></span>${C.cats[c].curto}`, !n); }).join('')}</div></section>
+  ${ORDER.filter(c => c !== 'geral').map(c => rail(C.cats[c].nome, vids.filter(v => v.cat === c), '#/biblioteca?cat=' + c)).join('')}
   ${rail('Acervo geral', vids.filter(v => v.cat === 'geral'), '#/biblioteca?cat=geral')}`;
 };
 
@@ -408,7 +444,7 @@ V.biblioteca = (qs) => {
   setTimeout(libRender);
   const cats = ['novos', 'ineditos', 'cortes', 'memes', 'curiosidades', 'teorias', 'reacts', 'clipes', 'vazamentos', 'trailers', 'comparacoes', 'longos', 'geral'].filter(c => S.vids.some(v => v.cat === c && vidAllowed(v)));
   return `
-  <div class="sec-h rv"><div><h1 class="h1" style="font-size:clamp(30px,4vw,44px)">Biblioteca</h1><p>Filtre por categoria, tema ou criador. Tudo pronto para baixar.</p></div></div>
+  ${heroX('biblioteca', `${ic('film')} ${fmt(allowedVids().length)} vídeos`, 'Biblioteca', 'completa', 'Filtre por categoria, tema ou criador. Tudo pronto para baixar, com legenda para cada rede.', '', '', 'sm eager')}<div style="height:18px"></div>
   <div class="filters">
     <div class="row" style="margin-bottom:10px"><label class="search" style="display:block;flex:1;max-width:none">${ic('funnel')}<input id="lq" type="search" placeholder="Buscar" value="${esc(LIB.q)}"></label>
       <select class="input" id="lord" style="width:auto;padding:10px 38px 10px 12px;font-size:13.5px"><option value="rec">Mais recentes</option><option value="az">Ordem</option><option value="rand">Aleatório</option></select></div>
@@ -456,11 +492,11 @@ function bindLib() {
 
 /* ---------- Inéditos ---------- */
 V.ineditos = () => {
-  if (!can('ineditos')) return lockCard('ineditos', 'Os Cortes Inéditos são produzidos pelo nosso time e fazem parte do plano Completo.');
+  if (!can('ineditos')) return lockCard('ineditos', 'Os Cortes Inéditos são produzidos pelo nosso time e fazem parte do plano Completo.', 'ineditos');
   const vids = S.vids.filter(v => v.cat === 'ineditos');
-  return `<section class="hero art-sunset rv"><span class="sun"></span><div class="in"><span class="kick">${ic('gem')} Exclusivo</span><h1 class="h1">Cortes<br><span class="grad">Inéditos</span></h1><p class="lead">Cortes de streamers brasileiros feitos pelo nosso time. Você não encontra em nenhum outro pack, então chega antes de todo mundo.</p></div></section>
-  <div class="sec-h sec"><div><h2 class="h2">Disponíveis agora</h2><p>Novos cortes entram toda semana junto com a Recarga.</p></div></div>
-  <div class="vgrid">${vids.map(vcard).join('')}</div>`;
+  const criadores = [...new Set(vids.map(v => v.tema))];
+  return `${heroX('ineditos', `${ic('gem')} Exclusivo do Canal Vice City`, 'Cortes', 'Inéditos', 'Cortes de streamers brasileiros feitos pelo nosso time. Você não encontra em nenhum outro pack, então chega antes de todo mundo.', '', '', 'eager')}
+  ${criadores.map(t => `<section class="sec"><div class="sec-h"><div><span class="eyebrow-s">criador</span><h2 class="h2">${esc(C.temas[t] || t)}</h2><p>${vids.filter(v => v.tema === t).length} cortes · novos entram toda semana</p></div></div><div class="vgrid">${vids.filter(v => v.tema === t).map(vcard).join('')}</div></section>`).join('')}`;
 };
 
 /* ---------- Imagens ---------- */
@@ -468,7 +504,7 @@ let IMGN = 60;
 V.imagens = () => {
   IMGN = 60;
   setTimeout(imgRender);
-  return `<div class="sec-h rv"><div><h1 class="h1" style="font-size:clamp(30px,4vw,44px)">Imagens</h1><p>${fmt(S.imgs.length)} posts em imagem para feed, stories e carrossel. Baixe no tamanho original.</p></div></div>
+  return `${heroX('imagens', `${ic('card')} ${fmt(S.imgs.length)} imagens`, 'Imagens', 'para o feed', 'Posts em imagem para feed, stories e carrossel. Baixe no tamanho original.', '', '', 'sm eager')}<div style="height:18px"></div>
   <div class="vgrid" id="igrid" style="grid-template-columns:repeat(auto-fill,minmax(160px,1fr))"></div><div class="pager"><button class="btn btn-g" id="imore">Carregar mais</button></div>`;
 };
 function imgRender() {
@@ -488,8 +524,8 @@ V.plano = (qs, sub) => {
   QZ.started = true;
   const q = C.quiz[QZ.i];
   const sel = QZ.a[q.id] || (q.tipo === 'varios' ? [] : '');
-  return `<div class="quiz">
-    <span class="kick">${ic('rocket')} Plano de Golpe · ${QZ.i + 1} de ${C.quiz.length}</span>
+  return `${QZ.i === 0 ? heroX('plano', `${ic('rocket')} Missão 1`, 'Plano de', 'Golpe', '5 perguntas rápidas e você recebe a estratégia pronta: onde postar, quantos posts por dia e o caminho mais curto para monetizar.', '', '', 'sm eager') + '<div style="height:22px"></div>' : ''}<div class="quiz">
+    <span class="kick">${ic('rocket')} Pergunta ${QZ.i + 1} de ${C.quiz.length}</span>
     <div class="qsteps">${C.quiz.map((_, i) => `<i class="${i <= QZ.i ? 'on' : ''}"></i>`).join('')}</div>
     <h1 class="h1" style="font-size:clamp(28px,4.4vw,46px)">${q.q}</h1>${q.sub ? `<p class="mut" style="margin-top:6px">${q.sub}</p>` : ''}
     <div id="qops" style="margin-top:14px">${q.ops.map(([k, t, d]) => { const on = q.tipo === 'varios' ? sel.includes(k) : sel === k; return `<button class="qop ${on ? 'on' : ''}" data-k="${k}"><span class="ck"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5 9-10"/></svg></span><span><b>${t}</b>${d ? `<small>${d}</small>` : ''}</span></button>`; }).join('')}</div>
@@ -535,8 +571,7 @@ function planoView(p) {
     ['Semana 2', 'Ajuste', ['Veja quais 3 vídeos passaram da média e poste mais da mesma categoria.', 'Teste ganchos novos do Kit Remix nos vídeos fracos.', `Ative a primeira fonte de renda: ${C.rotas.find(r => r.id === pl.rotas[0]).nome}.`]],
     ['Semanas 3 e 4', 'Escala', ['Repita o formato vencedor e suba para +1 post por dia se der.', `Abra a segunda fonte de renda: ${C.rotas.find(r => r.id === pl.rotas[1]).nome}.`, 'Gere a agenda do próximo mês e mantenha a Recarga semanal no ar.']]
   ];
-  return `<section class="hero art-sunset rv"><span class="sun"></span><div class="in"><span class="kick">${ic('rocket')} Seu Plano de Golpe</span><h1 class="h1">${esc(pl.nome)}</h1><p class="lead">${esc(pl.resumo)}</p>
-  <div class="row" style="margin-top:14px"><a class="btn btn-p" href="#/agenda?plano=1">${ic('cal')}Gerar minha agenda com este plano</a><a class="btn btn-g" href="#/plano/refazer">Refazer</a></div></div></section>
+  return `${heroX('plano', `${ic('rocket')} Seu Plano de Golpe`, 'Golpe', esc(pl.nome.replace('Golpe ', '')), esc(pl.resumo), `<a class="btn btn-p" href="#/agenda?plano=1">${ic('cal')}Gerar minha agenda com este plano</a><a class="btn btn-g" href="#/plano/refazer">Refazer</a>`, '', 'eager')}
   <div class="grid3 sec" style="margin-top:18px">${pl.kpis.map(k => `<div class="statc rv"><b class="grad">${esc(k[0])}</b><span>${esc(k[1])}</span></div>`).join('')}</div>
   <section class="grid2 sec">
     <div class="card rv"><h3 class="h3">O roteiro do golpe</h3><div style="margin-top:8px">${semanas.map(([d, t, li]) => `<div class="plan-step"><div class="d">${d}<br><span class="script" style="font-size:16px;text-transform:none">${t}</span></div><ul class="ul">${li.map(x => `<li>${ic('check')}<span>${esc(x)}</span></li>`).join('')}</ul></div>`).join('')}</div></div>
@@ -550,7 +585,7 @@ function planoView(p) {
 /* ---------- Gerador Agenda Vice ---------- */
 let AG = null;
 V.agenda = (qs) => {
-  if (!can('agenda')) return lockCard('agenda', 'O Gerador Agenda Vice faz parte do plano Completo.');
+  if (!can('agenda')) return lockCard('agenda', 'O Gerador Agenda Vice faz parte do plano Completo.', 'agenda');
   const p = new URLSearchParams(qs);
   const plano = load('plano', null);
   const salvo = load('agenda', null);
@@ -558,7 +593,7 @@ V.agenda = (qs) => {
   if (p.get('plano') && plano) AG = agDefault(plano);
   setTimeout(() => { if (salvo && !p.get('plano')) agShow(salvo); });
   return `
-  <section class="hero rv" style="min-height:240px;background:radial-gradient(120% 140% at 90% 0%,#22d3c5 0%,#2b6f9e 25%,#3a1e6b 55%,#1a0b2e 85%)"><div class="in"><span class="kick">${ic('cal')} Bônus 1</span><h1 class="h1">Gerador<br><span class="grad">Agenda Vice</span></h1><p class="lead">Escolha as redes e o ritmo. O gerador monta seus 30 dias com vídeos reais do acervo, horário, gancho, legenda e hashtags. Não gostou? Gera de novo.</p></div></section>
+  ${heroX('agenda', `${ic('cal')} Bônus 1`, 'Gerador', 'Agenda Vice', 'Escolha as redes e o ritmo. O gerador monta seus 30 dias com vídeos reais do acervo, horário, gancho, legenda e hashtags. Não gostou? Gera de novo.', '', '', 'sm eager')}
   <section class="card sec rv" id="agform">
     <div class="row"><h2 class="h3">1. Onde você vai postar</h2><span class="sp"></span>${plano ? `<button class="btn btn-g btn-xs" id="agplano">${ic('rocket')}Usar meu Plano de Golpe</button>` : ''}</div>
     <div class="plat-sel" style="margin-top:12px">${Object.entries(C.plats).map(([k, pl]) => { const n = AG.plats[k] || 0; return `<div class="plat-b ${n ? 'on' : ''}" style="--pc:${pl.cor}" data-pk="${k}"><button style="text-align:left;width:100%" data-pt="${k}"><b><span class="dt"></span>${pl.nome}</b></button><div class="stepper ${n ? '' : 'hide'}"><button data-pm="${k}">−</button><span>${n}/dia</span><button data-pp="${k}">+</button></div></div>`; }).join('')}</div>
@@ -760,15 +795,22 @@ function baixar(txt, nome, tipo) { const u = URL.createObjectURL(new Blob([txt],
 
 /* ---------- Bônus (hub no celular) ---------- */
 V.bonus = () => {
-  const items = [['plano', 'Plano de Golpe', 'rocket', null, '#ff2d7a'], ['agenda', 'Gerador Agenda Vice', 'cal', 'agenda', '#22d3c5'], ['canal', 'Canal do Zero', 'user', 'canal', '#ffc861'], ['grana', 'Mapa da Grana', 'coin', 'grana', '#4ade80'], ['remix', 'Kit Remix', 'wand', 'remix', '#a78bfa'], ['ferramentas', 'Ferramentas', 'bolt', 'ferramentas', '#38bdf8'], ['estrutura', 'Estrutura de Vendas', 'funnel', 'estrutura', '#ff8a3d'], ['ineditos', 'Cortes Inéditos', 'gem', 'ineditos', '#ffc861'], ['imagens', 'Imagens', 'card', null, '#f472b6'], ['extra/capas', 'Kit Capas', 'tag', 'capas', '#fb7185'], ['extra/carrossel', 'Pack Carrossel', 'note', 'carrossel', '#facc15'], ['extra/piloto', 'Piloto Automático', 'play', 'piloto_lite', '#c084fc']];
-  return `<h1 class="h1" style="font-size:36px">Bônus e extras</h1><div class="grid2" style="margin-top:16px">${items.map(([r, n, i, k, c]) => `<a class="modc rv ${!k || can(k) ? '' : 'lock'}" href="#/${r}" style="min-height:110px;background:linear-gradient(160deg,color-mix(in srgb,${c} 22%,#24133f),#170c2c)">${!k || can(k) ? '' : `<span class="lockb">${ic('lock')} Bloqueado</span>`}<span class="ico" style="color:${c}">${ic(i)}</span><span class="n">${n}</span></a>`).join('')}</div>`;
+  const G = [
+    ['Comece aqui', [['rota', 'plano', 'Rota Vice City', 'As 6 missões em ordem', null], ['guia', 'canal', 'Guia do iniciante', 'Dúvidas de quem está começando', null], ['plano', 'plano', 'Plano de Golpe', 'Sua estratégia em 5 perguntas', null]]],
+    ['Seus vídeos', [['recarga', 'recarga', 'Recarga Vice City', 'Lote novo toda semana', null], ['ineditos', 'ineditos', 'Cortes Inéditos', 'Só aqui, feitos pelo nosso time', 'ineditos'], ['imagens', 'imagens', 'Imagens para feed', `${fmt(S.imgs.length)} posts prontos`, null]]],
+    ['Crescer o canal', [['agenda', 'agenda', 'Gerador Agenda Vice', 'Seu mês em 1 clique', 'agenda'], ['canal', 'canal', 'Canal do Zero', 'Perfil pronto em 1 hora', 'canal'], ['remix', 'remix', 'Kit Remix', `${C.totalGanchos} ganchos + gerador`, 'remix'], ['ferramentas', 'ferramentas', 'Ferramentas', 'Logos, capas e limpeza do arquivo', 'ferramentas']]],
+    ['Fazer dinheiro', [['grana', 'grana', 'Mapa da Grana', `${C.rotas.length} formas de monetizar`, 'grana'], ['estrutura', 'estrutura', 'Estrutura de Vendas', 'O nosso funil, aberto para você', 'estrutura']]],
+    ['Extras', [['extra/capas', 'capas', 'Kit Capas', 'Capas que fazem clicar', 'capas'], ['extra/carrossel', 'carrossel', 'Pack Carrossel', '100 carrosséis prontos', 'carrossel'], ['extra/piloto', 'piloto', 'Piloto Automático', 'Robô de Cortes e prompts', 'piloto_lite']]]
+  ];
+  return `${heroX('login', `${ic('gem')} Seu arsenal`, 'Bônus e', 'extras', 'Tudo o que vem com o Canal Vice City, organizado pelo que você quer fazer agora.', '', '', 'sm eager')}
+  ${G.map(([g, it]) => `<section class="sec"><div class="sec-h"><div><h2 class="h2">${g}</h2></div></div><div class="tiles">${it.map(([r, im, n, d, k]) => tile('#/' + r, im, n, d, '', !!k && !can(k))).join('')}</div></section>`).join('')}`;
 };
 
 /* ---------- Conta ---------- */
 V.conta = () => {
   const comprados = Object.entries(CFG.produtos).filter(([, p]) => p.libera.every(x => can(x)));
   return `<h1 class="h1" style="font-size:36px">Sua conta</h1>
-  <div class="card sec rv" style="margin-top:16px"><div class="row"><span class="av" style="width:48px;height:48px;font-size:18px">${esc(S.user.email[0].toUpperCase())}</span><div><b>${esc(S.user.email)}</b><div class="dim" style="font-size:13px">Nível ${wantedLevel()} de 5</div></div></div></div>
+  <div class="card sec rv" style="margin-top:16px"><div class="row"><span class="av" style="width:48px;height:48px;font-size:18px">${esc(S.user.email[0].toUpperCase())}</span><div><b>${esc(S.user.email)}</b><div class="dim" style="font-size:13px">Nível ${wantedLevel()} de 6</div></div></div></div>
   <div class="card sec rv"><h3 class="h3">Seus produtos</h3><div style="display:grid;gap:8px;margin-top:12px">${Object.entries(CFG.produtos).map(([k, p]) => { const ok = p.libera.every(x => can(x)); return `<div class="row" style="padding:12px;border-radius:12px;background:rgba(255,255,255,.04)"><span>${ok ? ic('check') : ic('lock')}</span><b>${esc(p.nome)}</b><span class="sp"></span>${ok ? '<span class="pill" style="color:var(--aqua)">Liberado</span>' : `<a class="btn btn-g btn-xs" href="${p.checkout}" target="_blank" rel="noopener">${esc(p.preco)}</a>`}</div>`; }).join('')}</div></div>
   <div class="grid2 sec"><a class="btn btn-g" href="${CFG.SUPORTE_WHATSAPP}" target="_blank" rel="noopener">${ic('chat')}Suporte no WhatsApp</a><button class="btn btn-g" id="sair2">Sair da conta</button></div>`;
 };
@@ -795,7 +837,8 @@ function route(keepScroll) {
   const view = $('#view'); if (!view) return;
   const y = scrollY;
   view.innerHTML = fn(qs, sub) || '';
-  $$('[data-r]').forEach(a => { const r = a.dataset.r; a.classList.toggle('on', r === name || r === path || (r === 'bonus' && ['canal', 'grana', 'remix', 'ferramentas', 'estrutura', 'plano', 'extra', 'ineditos', 'imagens', 'bonus'].includes(name))); });
+  $$('[data-r]').forEach(a => { const r = a.dataset.r; a.classList.toggle('on', r === name || r === path || (r === 'bonus' && ['canal', 'grana', 'remix', 'ferramentas', 'estrutura', 'plano', 'extra', 'ineditos', 'imagens', 'bonus', 'guia'].includes(name))); });
+  window.__closeSide && window.__closeSide();
   bindCards(view); bindRails(); bindLib(); bindQuiz(); bindAgenda();
   window.BONUS?.bind?.(name, sub, qs);
   const s2 = $('#sair2'); if (s2) s2.onclick = logout;
@@ -841,6 +884,16 @@ async function boot() {
   await loadAccess();
   if (!MODO_PREVIA && !S.acc.size) { document.body.innerHTML = SPRITE; viewLogin('Não encontramos uma compra aprovada para ' + S.user.email + '. Use o mesmo e-mail da compra ou fale com o suporte.'); await S.sb.auth.signOut(); return; }
   shell(); route();
+  if (!load('boasvindas', false)) setTimeout(welcome, 500);
+}
+function welcome() {
+  openModal(`<div class="welcome"><img class="wl" src="${LOGO}" alt="Canal Vice City"><h2><span class="chrome disp" style="font-size:30px;display:block">Bem-vindo a</span><span class="brush" style="font-size:52px">Vice City</span></h2>
+  <p class="mut" style="margin-top:10px">Aqui você tem tudo para colocar um canal de GTA 6 no ar e fazer dinheiro com ele. Para não se perder, siga a Rota Vice City: 6 missões, uma estrela de procurado para cada.</p>
+  <div class="wsteps">${ROTA.map((m, i) => `<div>${STAR}<span><b>${i + 1}.</b> ${m.n}</span></div>`).join('')}</div>
+  <button class="btn btn-p" id="wgo" style="width:100%">${ic('rocket')}Começar a missão 1</button><button class="btn btn-g btn-s" id="wlater" style="margin-top:10px;width:100%">Explorar primeiro</button></div>`);
+  const done = () => save('boasvindas', true);
+  $('#wgo').onclick = () => { done(); closeModal(); location.hash = '#/plano'; };
+  $('#wlater').onclick = () => { done(); closeModal(); };
 }
 window.addEventListener('hashchange', () => route());
 window.CVCAPP = { load, save, can, ic, esc, copy, toast, openModal, closeModal, thumb, dl, lockCard, starsHtml, refreshStars, route, reveal, S };

@@ -6,10 +6,10 @@ const { ic, esc, copy, toast, load, save, can, lockCard, thumb, dl } = A;
 const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const B = {};
 const ROBO_ZIP = '1vVoECOc3iAuO6j8w1YFRNsaZxKVO4fDG';
-const LOGO_IDS = { 1: '1R0psZtRHypOXioxPbvOmSpaiGGQLB8Oh', 2: '1tlrBHL5sDAG6mPeNxQrJ-3Ry9r3t5ipx', 3: '1s2JEyux10B7mqREU5TiZa0eTI9H5TnbP', 4: '1bqmQ_KC4Bhju4Nn3eSfc30uUMBo_KnP4', 5: '1WlAZ9btKmTkpbJEj812gcGnBDDSEhMqY', 6: '1tn29aS0KwddvAoy-UIvVsQD7DMMPuHaO', 7: '1ODWbsSx3RqPbtTwCwME_EE9k3xhHPjtq' };
 
-const hero = (kick, t1, t2, lead, grad = 'radial-gradient(120% 140% at 85% 0%,#ff8a3d 0%,#ff2d7a 28%,#5b1a7a 55%,#1a0b2e 80%)', extra = '') =>
-  `<section class="hero rv" style="background:${grad}"><span class="sun" style="position:absolute;right:7%;top:14%;width:200px;height:200px;border-radius:50%;background:linear-gradient(180deg,#ffd36e,#ff6a3d 60%,#ff2d7a);opacity:.85;-webkit-mask:repeating-linear-gradient(180deg,#000 0 13px,transparent 13px 19px)"></span><div class="in"><span class="kick">${kick}</span><h1 class="h1">${t1}<br><span class="grad">${t2}</span></h1><p class="lead">${lead}</p>${extra}</div></section>`;
+const IMG = k => `assets/img/${k}.webp`;
+const hero = (kick, t1, t2, lead, img = 'login', extra = '') =>
+  `<section class="hx rv"><img class="bg" src="${IMG(img)}" alt=""><div class="in"><span class="kick">${kick}</span><h1 style="margin-top:14px"><span class="t1 chrome">${t1}</span><span class="t2 brush">${t2}</span></h1><p class="lead">${lead}</p>${extra}</div></section>`;
 const doc = (chs) => `<div class="doc"><nav class="toc">${chs.map(([id, t]) => `<a href="#${id}" data-toc="${id}">${t}</a>`).join('')}</nav><div>${chs.map(([id, t, body]) => `<section class="chapter rv" id="${id}"><h2 class="h2">${t}</h2>${body}</section>`).join('')}</div></div>`;
 const chk = (key, t, d = '') => { const on = !!load('checks', {})[key]; return `<label class="chk ${on ? 'done' : ''}"><input type="checkbox" data-chk="${key}" ${on ? 'checked' : ''}><span><b>${t}</b>${d ? `<span>${d}</span>` : ''}</span></label>`; };
 const progresso = (keys) => { const c = load('checks', {}); const n = keys.filter(k => c[k]).length; return `<div class="row" style="margin-top:14px"><div class="prog" style="flex:1"><i style="width:${Math.round(n / keys.length * 100)}%"></i></div><b style="font-size:13px">${n}/${keys.length}</b></div>`; };
@@ -54,7 +54,7 @@ const PERFIS = {
 B.canal = () => {
   const nm = load('canal_nome', '');
   const keys = ['canal_nicho', 'canal_nome', 'canal_bio', 'canal_logo', 'canal_perfil', 'canal_posts', 'canal_agenda'];
-  return hero(`${ic('user')} Bônus 2`, 'Canal do', 'zero', 'Em menos de 1 hora você sai com nome, bio, logo com IA e o perfil configurado em cada rede. Marque cada etapa e acompanhe o progresso.', undefined, progresso(keys)) + doc([
+  return hero(`${ic('user')} Bônus 2`, 'Canal do', 'zero', 'Em menos de 1 hora você sai com nome, bio, logo com IA e o perfil configurado em cada rede. Marque cada etapa e acompanhe o progresso.', 'canal', progresso(keys)) + doc([
     ['cz1', '1. Escolha seu recorte', `<p class="mut">Canal com um assunto claro cresce mais rápido: o algoritmo entende para quem mostrar. Escolha um recorte principal (você pode misturar depois).</p>
       <div class="grid2" style="margin-top:14px">${NICHOS.map(([k, t, d]) => `<button class="qop ${load('canal_nicho_v', '') === k ? 'on' : ''}" data-nicho="${k}"><span class="ck"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5 9-10"/></svg></span><span><b>${t}</b><small>${d}</small></span></button>`).join('')}</div>`],
     ['cz2', '2. Nome do canal', `<p class="mut">Curto, fácil de falar e com GTA 6 ou Vice City no nome (ajuda na busca). Gere quantas vezes quiser.</p>
@@ -64,7 +64,7 @@ B.canal = () => {
     ['cz3', '3. Bio pronta', `<p class="mut">Bio diz em 2 segundos o que a pessoa vai encontrar. Copie a da sua rede.</p><div id="biosbox" style="display:grid;gap:10px;margin-top:12px"></div>`],
     ['cz4', '4. Logo e foto de perfil com IA', `<p class="mut">Abra o Gemini (gemini.google.com) ou o ChatGPT no celular, cole um prompt e peça a imagem. Quer seu rosto na logo? Use o prompt 1 e anexe uma foto.</p>
       <div class="grid2" style="margin-top:14px">${C.logos.slice(0, 4).map(l => logoCard(l, nm)).join('')}</div>
-      <a class="btn btn-g btn-s" href="#/ferramentas#fe1" style="margin-top:12px">Ver os ${C.logos.length} estilos de logo + banner e capa</a>
+      <a class="btn btn-g btn-s" href="#/ferramentas#fe1" style="margin-top:12px">Ver os ${C.logos.length} estilos de logo, banner e capa</a>
       ${chk('canal_logo', 'Logo e foto prontas')}`],
     ['cz5', '5. Crie os perfis', `<p class="mut">Siga o passo a passo das redes que você vai usar. Use o mesmo nome e a mesma foto em todas.</p>
       ${Object.entries(PERFIS).map(([k, passos]) => `<div class="card" style="margin-top:12px;padding:16px"><div class="row"><span class="pill" style="color:${C.plats[k].cor}">${C.plats[k].nome}</span></div><ol class="ul" style="margin-top:10px">${passos.map(p => `<li>${ic('check')}<span>${esc(p)}</span></li>`).join('')}</ol></div>`).join('')}
@@ -77,9 +77,9 @@ B.canal = () => {
   ]);
 };
 function logoCard(l, nome) {
-  const p = l.p.replace('[NOME DO SEU CANAL]', nome || '[NOME DO SEU CANAL]');
-  const img = LOGO_IDS[l.n];
-  return `<div class="prompt">${img ? `<img src="${thumb(img, 400)}" alt="" loading="lazy" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:12px;margin-bottom:10px">` : ''}<div class="row"><b>Prompt ${l.n} · ${esc(l.titulo)}</b>${l.novo || l.n > 7 ? '<span class="pill" style="color:var(--aqua)">Novo</span>' : ''}<span class="sp"></span>${copyBtn(p, 'Copiar prompt')}</div><p>${esc(p)}</p>${img ? `<a class="btn btn-g btn-xs" style="margin-top:10px" href="${dl(img)}" target="_blank" rel="noopener">Baixar logo de exemplo ${l.n}</a>` : ''}</div>`;
+  const p = l.p.replace(/\[NOME DO SEU CANAL\]/g, nome || '[NOME DO SEU CANAL]');
+  const img = `assets/logos/logo${l.n}.webp`;
+  return `<div class="prompt"><img src="${img}" alt="" loading="lazy" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:14px;margin-bottom:12px;box-shadow:0 0 0 1px rgba(255,47,179,.3)"><div class="row"><b>Estilo ${l.n} · ${esc(l.titulo)}</b><span class="sp"></span>${copyBtn(p, 'Copiar prompt')}</div><p>${esc(p)}</p><p class="dim" style="font-size:12px;margin-top:8px">Exemplo gerado com o nome "${esc(l.ex)}". O seu sai com o nome do seu canal.</p></div>`;
 }
 function bindCanal() {
   const v = $('#view');
@@ -98,12 +98,13 @@ function bindCanal() {
 /* =====================================================================
    MAPA DA GRANA
    ===================================================================== */
-B.grana = () => hero(`${ic('coin')} Bônus 3`, 'Mapa da', 'grana', `${C.rotas.length} formas de fazer dinheiro com o canal, com os requisitos de cada uma, o passo a passo para ativar e o que evitar. Conferido em novembro de 2026.`, 'radial-gradient(120% 140% at 85% 0%,#4ade80 0%,#0f9b8e 25%,#3a1e6b 60%,#1a0b2e 85%)') + `
+B.grana = () => hero(`${ic('coin')} Bônus 3`, 'Mapa da', 'grana', `${C.rotas.length} formas de fazer dinheiro com o canal, com os requisitos de cada uma, o passo a passo para ativar e o que evitar. Conferido em novembro de 2026.`, 'grana') + `
   <section class="card glow sec rv"><div class="row"><div style="flex:1;min-width:240px"><h2 class="h3">Qual caminho está aberto para você hoje?</h2><p class="mut" style="margin-top:6px;font-size:14px">Diga onde você está e o mapa mostra as rotas disponíveis agora.</p></div></div>
     <div class="grid3" style="margin-top:14px"><label class="field"><span>Seguidores no TikTok</span><input class="input" type="number" id="gtk" min="0" placeholder="0"></label><label class="field"><span>Inscritos no YouTube</span><input class="input" type="number" id="gyt" min="0" placeholder="0"></label><label class="field"><span>Views no último mês (todas as redes)</span><input class="input" type="number" id="gvw" min="0" placeholder="0"></label></div>
     <div id="gout" style="margin-top:14px"></div></section>
   <section class="sec"><div class="sec-h"><div><h2 class="h2">As rotas</h2><p>Comece pelas que pagam antes de ter audiência e ative as outras conforme cresce.</p></div></div>
   <div class="grid2">${C.rotas.map(r => `<article class="route rv" id="${r.id}" style="--rc:${r.cor}"><div class="row"><h3 class="h3">${r.nome}</h3></div><div class="req"><span class="pill" style="color:${r.cor}">${r.quando}</span><span class="pill">${r.seguidores}</span></div><p class="mut" style="font-size:14.5px">${r.como}</p><ol class="ul" style="margin-top:12px">${r.passos.map(p => `<li>${ic('check')}<span>${esc(p)}</span></li>`).join('')}</ol><div class="alert">${ic('shield')}<span>${esc(r.alerta)}</span></div></article>`).join('')}</div></section>
+  <section class="card glow sec rv"><span class="kick">${ic('star', 'f')} Missão 6 da Rota Vice City</span><h2 class="h3" style="margin-top:12px">Ative sua primeira fonte de renda</h2><p class="mut" style="margin-top:6px;font-size:14px">Escolha uma rota que já está aberta para você (veja acima), siga o passo a passo e marque aqui quando ativar. Isso acende a sexta estrela.</p>${chk('grana_ativa', 'Ativei minha primeira fonte de renda', 'Inscrição numa campanha, primeiro cliente de cortes, link de afiliado ativo ou programa da plataforma')}</section>
   <section class="card sec rv"><h2 class="h3">As 6 regras de ouro para não perder a monetização</h2><div class="grid2" style="margin-top:14px">${[
     ['Deixe o corte original', 'As plataformas pagam por conteúdo com contribuição sua: texto na tela, narração, reação ou edição. Repostar igual a outros perfis não monetiza.'],
     ['Cuidado com a música', 'O rádio do jogo pode gerar reivindicação de direitos no YouTube. Prefira trechos em que a voz domina o áudio.'],
@@ -132,7 +133,7 @@ function bindGrana() {
    KIT REMIX
    ===================================================================== */
 const GLAB = { curiosidade: 'Curiosidade', meme: 'Meme', corte: 'Corte', teoria: 'Teoria', react: 'React', noticia: 'Notícia', comparacao: 'Comparação', opiniao: 'Opinião' };
-B.remix = () => hero(`${ic('wand')} Bônus 4`, 'Kit', 'Remix', `${C.totalGanchos} ganchos testados no nicho, um gerador de títulos, legendas e hashtags, e fórmulas de roteiro para o seu post sair com a sua cara.`, 'radial-gradient(120% 140% at 85% 0%,#c084fc 0%,#7c3aed 28%,#3a1e6b 58%,#1a0b2e 85%)') + `
+B.remix = () => hero(`${ic('wand')} Bônus 4`, 'Kit', 'Remix', `${C.totalGanchos} ganchos testados no nicho, um gerador de títulos, legendas e hashtags, e fórmulas de roteiro para o seu post sair com a sua cara.`, 'remix') + `
   <section class="card glow sec rv" id="gen"><h2 class="h3">Gerador de títulos e legendas</h2>
     <div class="grid3" style="margin-top:12px"><label class="field"><span>Tema do vídeo</span><input class="input" id="rmt" placeholder="Ex.: perseguição em Vice Beach"></label><label class="field"><span>Formato</span><select class="input" id="rmf">${Object.entries(GLAB).map(([k, v]) => `<option value="${k}">${v}</option>`).join('')}</select></label><label class="field"><span>Rede</span><select class="input" id="rmp">${Object.entries(C.plats).map(([k, p]) => `<option value="${k}">${p.nome}</option>`).join('')}</select></label></div>
     <div class="row" style="margin-top:14px"><button class="btn btn-p" id="rmgo">${ic('wand')}Gerar</button></div><div id="rmout" style="margin-top:14px"></div></section>
@@ -166,8 +167,8 @@ function bindRemix() {
    ===================================================================== */
 B.ferramentas = () => {
   const nm = load('canal_nome', '');
-  return hero(`${ic('bolt')} Ferramentas`, 'Caixa de', 'ferramentas', 'Logos com IA, banner, capas, limpeza do arquivo antes de postar e atalhos para publicar em cada rede.', 'radial-gradient(120% 140% at 85% 0%,#38bdf8 0%,#2563eb 28%,#3a1e6b 58%,#1a0b2e 85%)') + doc([
-    ['fe1', 'Logos com IA', `<p class="mut">Digite o nome do canal e os prompts já saem com ele. Os prompts 1 a 7 têm logo de exemplo para baixar.</p><label class="field"><span>Nome do canal</span><input class="input" id="lgn" value="${esc(nm)}" placeholder="Ex.: Central GTA 6"></label><div class="grid2" id="lgbox" style="margin-top:14px"></div>`],
+  return hero(`${ic('bolt')} Ferramentas`, 'Caixa de', 'ferramentas', 'Logos com IA, banner, capas, limpeza do arquivo antes de postar e atalhos para publicar em cada rede.', 'ferramentas') + doc([
+    ['fe1', 'Logos com IA', `<p class="mut">Digite o nome do canal e os prompts já saem com ele. São 8 estilos exclusivos do Canal Vice City, cada um com um exemplo pronto.</p><label class="field"><span>Nome do canal</span><input class="input" id="lgn" value="${esc(nm)}" placeholder="Ex.: Central GTA 6"></label><div class="grid2" id="lgbox" style="margin-top:14px"></div>`],
     ['fe2', 'Banner, capa e foto com seu rosto', `<div style="display:grid;gap:12px">${C.promptsExtra.map(p => `<div class="prompt"><div class="row"><b>${esc(p.titulo)}</b><span class="sp"></span>${copyBtn(p.p.replace('[NOME DO SEU CANAL]', nm || '[NOME DO SEU CANAL]'), 'Copiar prompt')}</div><p>${esc(p.p.replace('[NOME DO SEU CANAL]', nm || '[NOME DO SEU CANAL]'))}</p></div>`).join('')}</div>`],
     ['fe3', 'Limpar informações do vídeo', `<p class="mut">Tira do arquivo MP4 ou MOV informações como título, autor e localização gravadas no vídeo. Tudo acontece no seu aparelho: o vídeo não é enviado para lugar nenhum. A imagem e o som continuam iguais.</p>
       <div class="card" style="margin-top:14px"><input type="file" id="mdf" accept="video/mp4,video/quicktime,.mp4,.mov" class="input"><div class="row" style="margin-top:12px"><button class="btn btn-p" id="mdgo" disabled>${ic('shield')}Gerar cópia limpa</button><span class="dim" id="mdst" style="font-size:13px"></span></div></div>`],
@@ -218,7 +219,7 @@ B.estrutura = () => {
   if (Date.now() < libera && !window.CVC_FORCAR_ESTRUTURA) {
     return `<div class="card lockscreen rv"><div class="big">${ic('funnel')}</div><span class="kick">Bônus 6</span><h2 class="h2" style="margin-top:12px">Estrutura de Vendas Vice City</h2><p class="lead" style="margin:10px auto 0">Esse bônus é liberado ${CFG.DIAS_ESTRUTURA} dias depois do seu primeiro acesso. Até lá, foque em colocar o canal no ar: é ele que vai trazer o público para você vender.</p><div class="countdown" id="cd" data-t="${libera}"></div><a class="btn btn-p" href="#/qg">${ic('rocket')}Voltar para a missão</a></div>`;
   }
-  return hero(`${ic('funnel')} Bônus 6`, 'Estrutura de', 'vendas', 'O mesmo funil que estamos usando para vender o Canal Vice City, aberto para você adaptar ao seu produto e vender para o público do seu canal.', 'radial-gradient(120% 140% at 85% 0%,#ff8a3d 0%,#e5135c 30%,#4c1d6b 60%,#1a0b2e 85%)') + `
+  return hero(`${ic('funnel')} Bônus 6`, 'Estrutura de', 'vendas', 'O mesmo funil que estamos usando para vender o Canal Vice City, aberto para você adaptar ao seu produto e vender para o público do seu canal.', 'estrutura') + `
   <section class="sec"><div class="sec-h"><div><h2 class="h2">O funil em 1 minuto</h2><p>Toque em cada etapa para ver como montamos.</p></div></div>
   <div class="row" id="funil" style="gap:8px">${FUNIL.map((f, i) => `<button class="chip ${i === 0 ? 'on' : ''}" data-fu="${i}">${i + 1}. ${f[0]}</button>`).join('')}</div>
   <div class="card glow" id="fubox" style="margin-top:14px"></div></section>` + doc([
@@ -272,8 +273,8 @@ const EXTRAS = {
 const CAPAS_TXT = ['NINGUÉM VIU ISSO', 'ESPERA O FINAL', 'GTA 5 x GTA 6', 'ISSO É REAL?', 'O SEGREDO DE VICE CITY', 'NÃO FAÇA ISSO', 'BUG INSANO', 'A POLÍCIA NÃO PERDOA', '3 DETALHES ESCONDIDOS', 'O MELHOR MOMENTO', 'ISSO MUDOU TUDO', 'ROCKSTAR EXAGEROU', 'VOCÊ NÃO SABIA', 'DEU TUDO ERRADO', 'TEORIA INSANA', 'O LUGAR MAIS PERIGOSO', 'PRIMEIRA VEZ NO GTA 6', 'OLHA ESSA FÍSICA', 'ISSO ESTAVA NO TRAILER', '13 ANOS DE DIFERENÇA'];
 B.extra = (qs, sub) => {
   const e = EXTRAS[sub]; if (!e) return '';
-  if (!can(e.k)) return hero(`${ic('lock')} Extra`, e.t1, e.t2, e.lead, `radial-gradient(120% 140% at 85% 0%,${e.cor} 0%,#5b1a7a 50%,#1a0b2e 85%)`) + lockCard(e.k, 'Este extra não faz parte da sua compra. Você pode liberar agora pelo mesmo preço da oferta.');
-  if (sub === 'capas') return hero(`${ic('tag')} Extra`, e.t1, e.t2, e.lead, `radial-gradient(120% 140% at 85% 0%,${e.cor} 0%,#5b1a7a 50%,#1a0b2e 85%)`) + doc([
+  if (!can(e.k)) return lockCard(e.k, 'Este extra não faz parte da sua compra. Você pode liberar agora pelo mesmo preço da oferta.', sub);
+  if (sub === 'capas') return hero(`${ic('tag')} Extra`, e.t1, e.t2, e.lead, 'capas') + doc([
     ['ca1', 'Como montar a capa no celular', `<ol class="ul">${['Abra o CapCut ou o Canva no celular e crie um design 1080x1920', 'Use um quadro forte do vídeo como fundo (pause no momento principal e tire print)', 'Escreva o texto da capa em letras grandes, no terço de cima, com contorno preto', 'Máximo de 4 palavras. Uma cor de destaque (amarelo ou rosa)', 'No TikTok e no Reels, escolha a capa na hora de postar; no Shorts, use a capa como primeiro quadro'].map(x => `<li>${ic('check')}<span>${esc(x)}</span></li>`).join('')}</ol>`],
     ['ca2', `${CAPAS_TXT.length} textos de capa`, `<div class="grid2">${CAPAS_TXT.map(t => `<div class="row" style="padding:14px;border-radius:14px;background:rgba(0,0,0,.3);border:1px solid var(--line)"><b class="disp" style="font-size:20px;color:#ffe14d;flex:1">${t}</b>${copyBtn(t)}</div>`).join('')}</div>`],
     ['ca3', 'Prompts de capa com IA', `<div style="display:grid;gap:12px">${[C.promptsExtra[1], { titulo: 'Capa estilo pôster', p: 'Crie uma capa vertical 9:16 no estilo pôster de filme de ação ambientado em uma cidade tropical neon fictícia ao entardecer, com o texto “[TEXTO DA CAPA]” em letras condensadas brancas enormes com contorno preto no topo. Contraste alto e leitura instantânea no celular, sem logotipos oficiais.' }, { titulo: 'Capa comparação', p: 'Crie uma capa vertical 9:16 dividida ao meio na diagonal: metade de cima em tons frios e granulados (antigo), metade de baixo em cores vibrantes de pôr do sol (novo). Texto “[TEXTO DA CAPA]” grande no centro, amarelo com contorno preto.' }].map(p => `<div class="prompt"><div class="row"><b>${esc(p.titulo)}</b><span class="sp"></span>${copyBtn(p.p, 'Copiar prompt')}</div><p>${esc(p.p)}</p></div>`).join('')}</div>`]
@@ -281,12 +282,12 @@ B.extra = (qs, sub) => {
   if (sub === 'carrossel') {
     const imgs = A.S.imgs;
     const sets = []; for (let i = 0; i + 5 <= Math.min(imgs.length, 500); i += 5) sets.push(imgs.slice(i, i + 5));
-    return hero(`${ic('note')} Extra`, e.t1, e.t2, e.lead, `radial-gradient(120% 140% at 85% 0%,${e.cor} 0%,#b45309 30%,#3a1e6b 60%,#1a0b2e 85%)`) + `
+    return hero(`${ic('note')} Extra`, e.t1, e.t2, e.lead, 'carrossel') + `
     <section class="card sec rv"><h3 class="h3">Como postar um carrossel</h3><ol class="ul" style="margin-top:10px">${['Baixe as 5 imagens do conjunto', 'No Instagram, toque em + → Publicação → selecione várias, na ordem', 'Use a legenda pronta e as hashtags', 'Poste 3 carrosséis por semana além dos Reels: carrossel gera salvamento e leva o perfil para mais gente'].map(x => `<li>${ic('check')}<span>${esc(x)}</span></li>`).join('')}</ol></section>
     <section class="sec"><div class="sec-h"><div><h2 class="h2">${sets.length} carrosséis prontos</h2><p>Conjuntos de 5 imagens do acervo, na ordem para postar.</p></div></div>
     <div class="grid3">${sets.map((s, i) => `<div class="card rv" style="padding:14px"><div class="row"><b class="disp" style="font-size:18px">Carrossel ${i + 1}</b><span class="sp"></span>${copyBtn(`${C.ganchos.curiosidade[i % C.ganchos.curiosidade.length]}\n\nArrasta pro lado e me diz qual você não sabia.\n\n#GTA6 #GTAVI #ViceCity #CuriosidadesGTA`, 'Legenda')}</div><div style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-top:10px">${s.map(([id]) => `<a href="${dl(id)}" target="_blank" rel="noopener"><img loading="lazy" src="${thumb(id, 200)}" alt="" style="aspect-ratio:4/5;object-fit:cover;border-radius:6px;width:100%"></a>`).join('')}</div></div>`).join('')}</div></section>`;
   }
-  if (sub === 'piloto') return hero(`${ic('play')} Extra`, e.t1, e.t2, e.lead, `radial-gradient(120% 140% at 85% 0%,${e.cor} 0%,#6d28d9 30%,#3a1e6b 60%,#1a0b2e 85%)`) + doc([
+  if (sub === 'piloto') return hero(`${ic('play')} Extra`, e.t1, e.t2, e.lead, 'piloto') + doc([
     ['pi1', 'Robô de Cortes', can('robo') ? `<p class="mut">Transforme uma live ou gravação longa em até 5 cortes verticais com o momento exato de cada trecho. Escolha o jeito que funciona para você.</p>
       <div class="grid2" style="margin-top:14px"><div class="card"><span class="pill" style="color:var(--aqua)">Pelo celular</span><h3 class="h3" style="margin-top:10px">Corte automático na nuvem</h3><ol class="ul" style="margin-top:10px">${['Abra um editor online com corte automático (o CapCut tem "cortes automáticos" / clipes longos para curtos)', 'Envie a gravação da live', 'Escolha os trechos sugeridos e o formato 9:16', 'Ajuste a legenda e exporte', 'Use o Kit Remix para o gancho e a legenda'].map(x => `<li>${ic('check')}<span>${esc(x)}</span></li>`).join('')}</ol></div>
       <div class="card"><span class="pill" style="color:var(--gold)">No computador</span><h3 class="h3" style="margin-top:10px">Robô de Cortes (Mac e Windows)</h3><p class="mut" style="font-size:13.5px;margin-top:8px">Roda no seu computador, sem conta e sem chave de API. Transcreve a fala, aponta os melhores trechos e salva os MP4.</p><a class="btn btn-p btn-s" style="margin-top:12px" href="${dl(ROBO_ZIP)}" target="_blank" rel="noopener">${ic('play')}Baixar o Robô (134 MB)</a>
