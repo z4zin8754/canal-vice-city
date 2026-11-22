@@ -163,10 +163,12 @@ async function gravar(seg) {
   const rec = new MediaRecorder(stream, tipo ? { mimeType: tipo, videoBitsPerSecond: 6e6, audioBitsPerSecond: 160e3 } : undefined);
   const parts = [];
   rec.ondataavailable = e => { if (e.data && e.data.size) parts.push(e.data); };
+  rec.onerror = e => dbg('erro ' + (e.error && e.error.name) + ' ' + (e.error && e.error.message));
   st.gravando = true;
   await new Promise(r => { const f = () => { vid.removeEventListener('seeked', f); r(); }; vid.addEventListener('seeked', f); setTimeout(f, 1500); vid.currentTime = seg.a + 0.001; });
   dbg('seek ok');
   rec.start(500);
+  dbg('rec ' + rec.state + ' ' + rec.mimeType + ' v' + stream.getVideoTracks().length + ' a' + stream.getAudioTracks().length);
   await vid.play();
   dbg('play');
   await new Promise(res => {
