@@ -45,8 +45,18 @@ function acharEmail(campos) {
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(200).json({ ok: true, info: 'webhook Hubla · Canal Vice City' });
-  const token = req.headers['x-hubla-token'] || req.query.token;
-  if (!process.env.HUBLA_TOKEN || token !== process.env.HUBLA_TOKEN) return res.status(401).json({ erro: 'token' });
+  const esperado = String(process.env.HUBLA_TOKEN || '').trim();
+  const h = req.headers || {};
+  const candidatos = [h['x-hubla-token'], h['x-hubla-signature'], h['x-webhook-token'], h['hubla-token'], h['token'],
+    String(h['authorization'] || '').replace(/^Bearer\s+/i, ''), req.query?.token].filter(Boolean).map(v => String(v).trim());
+  if (!esperado || !candidatos.includes(esperado)) {
+    // registra só os NOMES dos cabeçalhos (nunca os valores) para diagnosticar a autenticação
+    if (process.env.SUPABASE_SERVICE_KEY) await fetch(`${(process.env.SUPABASE_URL || 'https://xvnjteechdwwwepxlyel.supabase.co')}/rest/v1/eventos`, {
+      method: 'POST', headers: { apikey: process.env.SUPABASE_SERVICE_KEY, Authorization: `Bearer ${process.env.SUPABASE_SERVICE_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tipo: 'auth_falhou', bruto: { cabecalhos: Object.keys(h), tem_env: !!esperado, tam_env: esperado.length, tams: candidatos.map(c => c.length) } })
+    }).catch(() => {});
+    return res.status(401).json({ erro: 'token' });
+  }
 
   const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body || {});
   const tipo = String(body.type || body.event_type || body.event || '').toLowerCase();
