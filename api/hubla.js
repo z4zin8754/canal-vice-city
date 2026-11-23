@@ -53,7 +53,7 @@ export default async function handler(req, res) {
   const campos = []; walk(body, [], campos);
 
   // log bruto de todo evento (ajuda a conferir o primeiro teste)
-  const sb = (path, opts) => fetch(`${process.env.SUPABASE_URL}/rest/v1/${path}`, {
+  const sb = (path, opts) => fetch(`${(process.env.SUPABASE_URL || 'https://xvnjteechdwwwepxlyel.supabase.co')}/rest/v1/${path}`, {
     ...opts,
     headers: { apikey: process.env.SUPABASE_SERVICE_KEY, Authorization: `Bearer ${process.env.SUPABASE_SERVICE_KEY}`, 'Content-Type': 'application/json', ...(opts.headers || {}) }
   });

@@ -22,7 +22,7 @@ export default async function handler(req, res) {
   if (!negado && !aprovado) return res.status(200).json({ ok: true, ignorado: evento });
   const status = negado ? (/refund|reembols|chargeback/.test(evento) ? 'reembolsada' : 'cancelada') : 'aprovada';
   const rows = chaves.map(produto => ({ email, produto, status, pedido, origem: 'lastlink', bruto: body }));
-  const r = await fetch(`${process.env.SUPABASE_URL}/rest/v1/compras?on_conflict=email,produto`, {
+  const r = await fetch(`${(process.env.SUPABASE_URL || 'https://xvnjteechdwwwepxlyel.supabase.co')}/rest/v1/compras?on_conflict=email,produto`, {
     method: 'POST',
     headers: { apikey: process.env.SUPABASE_SERVICE_KEY, Authorization: `Bearer ${process.env.SUPABASE_SERVICE_KEY}`, 'Content-Type': 'application/json', Prefer: 'resolution=merge-duplicates' },
     body: JSON.stringify(rows)

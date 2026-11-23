@@ -6,8 +6,8 @@ export default async function handler(req, res) {
   const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : (req.body || {});
   const email = String(body.email || req.query.email || '').trim().toLowerCase();
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({ ok: false, erro: 'email' });
-  if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_KEY) return res.status(503).json({ ok: false, erro: 'banco' });
-  const r = await fetch(`${process.env.SUPABASE_URL}/rest/v1/compras?select=produto,status&email=eq.${encodeURIComponent(email)}`, {
+  if (!(process.env.SUPABASE_URL || 'https://xvnjteechdwwwepxlyel.supabase.co') || !process.env.SUPABASE_SERVICE_KEY) return res.status(503).json({ ok: false, erro: 'banco' });
+  const r = await fetch(`${(process.env.SUPABASE_URL || 'https://xvnjteechdwwwepxlyel.supabase.co')}/rest/v1/compras?select=produto,status&email=eq.${encodeURIComponent(email)}`, {
     headers: { apikey: process.env.SUPABASE_SERVICE_KEY, Authorization: `Bearer ${process.env.SUPABASE_SERVICE_KEY}` }
   });
   if (!r.ok) return res.status(502).json({ ok: false, erro: 'banco' });
