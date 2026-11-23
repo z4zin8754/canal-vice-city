@@ -29,5 +29,6 @@ window.CVC = {
                   libera: ['clube'] }
   },
   AFILIADOS: 'https://hub.la/group_affiliate/0bkjLGvqCBno9JeLZWi2',   // programa de afiliados da Hubla (só compradores) (comissão de 50%)
+  AFILIADOS_START: 'https://hub.la/group_affiliate/Tbk2JcmK1yaMJZv6Bsy9', // afiliação do Start (quem comprou o Start, 50%)
 
 };
