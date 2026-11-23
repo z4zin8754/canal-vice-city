@@ -58,3 +58,8 @@ create table if not exists public.eventos (
   recebido timestamptz default now()
 );
 alter table public.eventos enable row level security;
+
+-- o servidor (webhook /api/hubla e login /api/acesso) usa a chave service_role
+grant usage on schema public to service_role;
+grant select, insert, update, delete on public.compras, public.eventos to service_role;
+grant usage, select on all sequences in schema public to service_role;
