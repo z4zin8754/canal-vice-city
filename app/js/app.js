@@ -11,7 +11,8 @@ const fmt = n => n.toLocaleString('pt-BR');
 const isoLocal = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 const IMG = k => `assets/img/${k}.webp`;
 const LOGO = 'assets/logo.webp', LOGO_S = 'assets/logo-96.webp';
-const MODO_PREVIA = !CFG.SUPABASE_URL;
+const LOGIN_EMAIL = CFG.LOGIN === 'email';      // login só com o e-mail da compra (confere em /api/acesso)
+const MODO_PREVIA = !LOGIN_EMAIL && !CFG.SUPABASE_URL;
 
 /* ---------- Drive ---------- */
 const thumb = (id, w = 480) => `https://drive.google.com/thumbnail?id=${id}&sz=w${w}`;
@@ -130,19 +131,33 @@ function viewLogin(msg = '') {
         <h2 class="h2" style="margin-top:22px">Entrar no app</h2>
         <p class="mut" style="margin-top:6px">Use o e-mail da sua compra.</p>
         ${msg ? `<div class="alert">${ic('bolt')}<span>${esc(msg)}</span></div>` : ''}
-        ${MODO_PREVIA ? '' : `<button class="btn gbtn" id="g" style="margin-top:22px"><svg viewBox="0 0 24 24" width="18" height="18"><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.4h6.5a5.6 5.6 0 0 1-2.4 3.6v3h3.9c2.3-2.1 3.5-5.2 3.5-8.7z"/><path fill="#34A853" d="M12 24c3.2 0 6-1.1 8-2.9l-3.9-3c-1.1.7-2.5 1.2-4.1 1.2-3.1 0-5.8-2.1-6.7-5H1.3v3.1A12 12 0 0 0 12 24z"/><path fill="#FBBC05" d="M5.3 14.3a7.2 7.2 0 0 1 0-4.6V6.6H1.3a12 12 0 0 0 0 10.8z"/><path fill="#EA4335" d="M12 4.8c1.8 0 3.4.6 4.6 1.8l3.4-3.4A12 12 0 0 0 1.3 6.6l4 3.1c.9-2.8 3.6-4.9 6.7-4.9z"/></svg>Entrar com Google</button><div class="or">ou</div>`}
+        ${MODO_PREVIA || LOGIN_EMAIL ? '' : `<button class="btn gbtn" id="g" style="margin-top:22px"><svg viewBox="0 0 24 24" width="18" height="18"><path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.4h6.5a5.6 5.6 0 0 1-2.4 3.6v3h3.9c2.3-2.1 3.5-5.2 3.5-8.7z"/><path fill="#34A853" d="M12 24c3.2 0 6-1.1 8-2.9l-3.9-3c-1.1.7-2.5 1.2-4.1 1.2-3.1 0-5.8-2.1-6.7-5H1.3v3.1A12 12 0 0 0 12 24z"/><path fill="#FBBC05" d="M5.3 14.3a7.2 7.2 0 0 1 0-4.6V6.6H1.3a12 12 0 0 0 0 10.8z"/><path fill="#EA4335" d="M12 4.8c1.8 0 3.4.6 4.6 1.8l3.4-3.4A12 12 0 0 0 1.3 6.6l4 3.1c.9-2.8 3.6-4.9 6.7-4.9z"/></svg>Entrar com Google</button><div class="or">ou</div>`}
         <form id="f">
           <label class="field"><span>E-mail</span><input class="input" type="email" id="em" required placeholder="seuemail@exemplo.com" autocomplete="email"></label>
           <label class="field hide" id="pwf"><span>Senha</span><input class="input" type="password" id="pw" autocomplete="current-password"></label>
-          <button class="btn btn-p" style="width:100%;margin-top:16px" id="sub">${MODO_PREVIA ? 'Entrar' : 'Receber link de acesso no e-mail'}</button>
+          <button class="btn btn-p" style="width:100%;margin-top:16px" id="sub">${MODO_PREVIA || LOGIN_EMAIL ? 'Entrar' : 'Receber link de acesso no e-mail'}</button>
         </form>
-        ${MODO_PREVIA ? '<p class="note"><span class="preview-flag">Modo prévia</span> O login com Google e o link por e-mail entram assim que o banco de dados for conectado.</p>' : '<button class="btn btn-g btn-s" id="usepw" style="margin-top:12px;width:100%">Prefiro entrar com senha</button><p class="note">Primeiro acesso? O link chega no e-mail da compra. Clicou, entrou.</p>'}
+        ${LOGIN_EMAIL ? '<p class="note">Digite o mesmo e-mail que você usou na compra. Não precisa de senha.</p><p class="note">Pagou agora? A liberação leva até 2 minutos. Se não entrar, tente de novo ou <a href="' + CFG.SUPORTE_WHATSAPP + '" target="_blank" rel="noopener" style="text-decoration:underline">fale com o suporte</a>.</p>' : MODO_PREVIA ? '<p class="note"><span class="preview-flag">Modo prévia</span> O login com Google e o link por e-mail entram assim que o banco de dados for conectado.</p>' : '<button class="btn btn-g btn-s" id="usepw" style="margin-top:12px;width:100%">Prefiro entrar com senha</button><p class="note">Primeiro acesso? O link chega no e-mail da compra. Clicou, entrou.</p>'}
       </div>
     </div>
   </div>`;
   reveal();
   const f = $('#f');
-  if (!MODO_PREVIA) {
+  const pre = new URLSearchParams(location.search).get('email') || localStorage.getItem('cvc:ultimo') || '';
+  if (pre && $('#em')) $('#em').value = pre;
+  if (LOGIN_EMAIL) {
+    f.onsubmit = async e => {
+      e.preventDefault();
+      const email = $('#em').value.trim().toLowerCase();
+      $('#sub').disabled = true; $('#sub').textContent = 'Conferindo sua compra...';
+      const r = await consultarAcesso(email);
+      if (!r) return viewLogin('Não conseguimos conferir agora. Verifique sua internet e tente de novo.');
+      if (!r.produtos.length) { localStorage.setItem('cvc:ultimo', email); return viewLogin('Não encontramos compra aprovada para ' + email + '. Use o mesmo e-mail do checkout. Se pagou por PIX agora, espere 1 ou 2 minutos e tente de novo.'); }
+      localStorage.setItem('cvc:acesso', JSON.stringify({ email, produtos: r.produtos, t: Date.now() }));
+      localStorage.setItem('cvc:ultimo', email);
+      boot();
+    };
+  } else if (!MODO_PREVIA) {
     let usePw = false;
     $('#g').onclick = () => S.sb.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: location.origin + location.pathname } });
     $('#usepw').onclick = () => { usePw = !usePw; $('#pwf').classList.toggle('hide', !usePw); $('#sub').textContent = usePw ? 'Entrar' : 'Receber link de acesso no e-mail'; $('#usepw').textContent = usePw ? 'Prefiro receber o link' : 'Prefiro entrar com senha'; };
@@ -262,7 +277,7 @@ function setPreviewAccess() {
 }
 async function logout() {
   if (S.sb) await S.sb.auth.signOut();
-  localStorage.removeItem('cvc:sessao');
+  localStorage.removeItem('cvc:sessao'); localStorage.removeItem('cvc:acesso');
   S.user = null; viewLogin();
 }
 
@@ -1058,12 +1073,28 @@ async function loadData() {
   S.imgs = cat.imagens; S.extras = cat.extras;
   window.CVCDATA = S;
 }
+async function consultarAcesso(email) {
+  try {
+    const ctl = new AbortController(); setTimeout(() => ctl.abort(), 10000);
+    const j = await fetch('/api/acesso', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }), signal: ctl.signal }).then(r => r.json());
+    return j && j.ok ? j : null;
+  } catch { return null; }
+}
+const lerAcesso = () => { try { return JSON.parse(localStorage.getItem('cvc:acesso')); } catch { return null; } };
 async function getSessao() {
+  if (LOGIN_EMAIL) { const a = lerAcesso(); return a?.email ? { email: a.email, id: null } : null; }
   if (MODO_PREVIA) { const em = localStorage.getItem('cvc:sessao'); return em ? { email: em, id: null } : null; }
   const { data } = await S.sb.auth.getSession();
   return data.session ? { email: data.session.user.email.toLowerCase(), id: data.session.user.id } : null;
 }
 async function loadAccess() {
+  if (LOGIN_EMAIL) {
+    const a = lerAcesso() || { produtos: [] };
+    const r = await consultarAcesso(S.user.email);          // atualiza (compra nova, upsell ou reembolso)
+    if (r) { a.produtos = r.produtos; a.t = Date.now(); localStorage.setItem('cvc:acesso', JSON.stringify({ ...a, email: S.user.email })); }
+    applyPlan(a.produtos || []);
+    return;
+  }
   if (MODO_PREVIA) { S.previewPlan = localStorage.getItem('cvc:simp') || 'completo'; setPreviewAccess(); return; }
   const { data } = await S.sb.from('compras').select('produto,status').eq('email', S.user.email);
   applyPlan((data || []).filter(x => x.status === 'aprovada').map(x => x.produto));
@@ -1075,12 +1106,12 @@ async function loadAccess() {
 }
 async function boot() {
   if (!SPRITE) await loadData();
-  if (!MODO_PREVIA && !S.sb) S.sb = window.supabase.createClient(CFG.SUPABASE_URL, CFG.SUPABASE_ANON_KEY);
+  if (!MODO_PREVIA && !LOGIN_EMAIL && !S.sb) S.sb = window.supabase.createClient(CFG.SUPABASE_URL, CFG.SUPABASE_ANON_KEY);
   S.user = await getSessao();
   if (!S.user) return viewLogin();
   if (!load('primeiro', null)) save('primeiro', Date.now());
   await loadAccess();
-  if (!MODO_PREVIA && !S.acc.size) { document.body.innerHTML = SPRITE; viewLogin('Não encontramos uma compra aprovada para ' + S.user.email + '. Use o mesmo e-mail da compra ou fale com o suporte.'); await S.sb.auth.signOut(); return; }
+  if (!MODO_PREVIA && !S.acc.size) { document.body.innerHTML = SPRITE; localStorage.removeItem('cvc:acesso'); viewLogin('Não encontramos uma compra aprovada para ' + S.user.email + '. Use o mesmo e-mail da compra ou fale com o suporte.'); if (S.sb) await S.sb.auth.signOut(); return; }
   shell(); route();
   if (!load('boasvindas', false)) setTimeout(welcome, 500);
   liveSync();

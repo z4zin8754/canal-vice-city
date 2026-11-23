@@ -2,10 +2,10 @@
 create table if not exists public.compras (
   id bigserial primary key,
   email text not null,
-  produto text not null,          -- chave de CVC.produtos: start, completo, capas, carrossel, piloto, piloto_lite
+  produto text not null,          -- chave de CVC.produtos: start, completo, estudio, kitfeed, piloto, piloto_lite
   status text not null default 'aprovada',  -- aprovada | reembolsada | cancelada
   pedido text,
-  origem text default 'lastlink',
+  origem text default 'hubla',
   bruto jsonb,
   criado timestamptz default now(),
   unique (email, produto)
@@ -49,3 +49,12 @@ begin
 end $$;
 drop trigger if exists ao_criar_usuario on auth.users;
 create trigger ao_criar_usuario after insert on auth.users for each row execute function public.novo_usuario();
+
+-- log de todo evento recebido da Hubla (só o servidor lê; serve para conferir os testes)
+create table if not exists public.eventos (
+  id bigserial primary key,
+  tipo text,
+  bruto jsonb,
+  recebido timestamptz default now()
+);
+alter table public.eventos enable row level security;
