@@ -338,6 +338,7 @@ function openVideo(id, plat = 'tiktok') {
   };
   openModal(sheet());
   $('#mbox').classList.add('pvbox');
+  { const im = new Image(); im.onload = () => { const pl = $('.pv-player'); if (pl && im.naturalWidth) { pl.style.aspectRatio = im.naturalWidth + '/' + im.naturalHeight; pl.classList.toggle('wide', im.naturalWidth > im.naturalHeight); } }; im.src = thumb(id, 400); }
   const rerenderSide = () => { const side = $('.pv-side'); if (!side) return; const tmp = document.createElement('div'); tmp.innerHTML = sheet(); side.replaceWith(tmp.querySelector('.pv-side')); };
   $('#mbox').onclick = e => {
     const b = e.target.closest('button,[data-dl]'); if (!b) return;
