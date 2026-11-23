@@ -177,7 +177,8 @@ const NAV = [
     ['qg', 'QG', 'app', null],
     ['hoje', 'Postar hoje', 'clock', null],
     ['rota', 'Rota Vice City', 'star', null],
-    ['guia', 'Guia do iniciante', 'note', null]
+    ['guia', 'Guia do iniciante', 'note', null],
+    ['instalar', 'Baixar o app', 'down', null]
   ]],
   ['Seus vídeos', [
     ['recarga', 'Recarga Vice City', 'refresh', null],
@@ -194,13 +195,15 @@ const NAV = [
   ]],
   ['Fazer dinheiro', [
     ['grana', 'Mapa da Grana', 'coin', 'grana'],
-    ['estrutura', 'Código do Dinheiro', 'funnel', 'estrutura']
+    ['estrutura', 'Código do Dinheiro', 'funnel', 'estrutura'],
+    ['revenda', 'Revenda e ganhe 50%', 'coin', 'revenda']
   ]],
   ['Extras', [
     ['extra/capas', 'Kit Capas', 'tag', 'capas'],
     ['extra/carrossel', 'Pack Carrossel', 'note', 'carrossel'],
     ['extra/piloto', 'Piloto Automático', 'play', 'piloto_lite'],
-    ['estudio', 'Estúdio Vice', 'wand', 'piloto_lite']
+    ['estudio', 'Estúdio Vice', 'wand', 'estudio'],
+    ['extra/clube', 'Clube Recarga Vice', 'refresh', 'clube']
   ]]
 ];
 function shell() {
@@ -255,7 +258,7 @@ function shell() {
 function refreshStars() { const el = $('#stars'), lv = wantedLevel(); if (el) el.innerHTML = starsHtml(lv); const n = $('#lvn'); if (n) n.textContent = `NÍVEL ${lv}/6`; }
 function setPreviewAccess() {
   const p = S.previewPlan;
-  applyPlan(p === 'tudo' ? ['completo', 'capas', 'carrossel', 'piloto'] : [p]);
+  applyPlan(p === 'tudo' ? ['completo', 'estudio', 'kitfeed', 'piloto', 'clube'] : [p]);
 }
 async function logout() {
   if (S.sb) await S.sb.auth.signOut();
@@ -384,6 +387,7 @@ V.qg = () => {
   ];
   return `
   ${heroX('qg', `${starsHtml(lv)}&nbsp; Nível ${lv} de 6`, `E aí, ${esc(first)}.`, 'Bem-vindo ao QG', m ? `Sua próxima missão: <b style="color:#fff">${m.n}</b>. Siga a Rota Vice City e cada missão concluída acende uma estrela.` : 'Rota completa. Agora é constância: siga a agenda e escale o que dá resultado.', m ? `<a class="btn btn-p" href="${m.r}">${ic('rocket')}${m.n}</a><a class="btn btn-g" href="#/guia">${ic('note')}Como funciona</a>` : `<a class="btn btn-p" href="#/agenda">${ic('cal')}Abrir minha agenda</a>`, `<img class="logo-big" src="${LOGO}" alt="">`, 'eager')}
+  ${!isStandalone() ? `<a class="card sec rv instb" href="#/instalar"><img src="${LOGO_S}" alt=""><span><b>Baixe o app no seu celular</b><span>Ícone na tela inicial, tela cheia e mais rápido. Leva 30 segundos.</span></span>${ic('down')}</a>` : ''}
   ${hojeCard()}
   ${m ? `<section class="sec"><div class="sec-h"><div><span class="eyebrow-s">sua próxima missão</span><h2 class="h2">Missão ${nm + 1} de 6</h2></div><a class="btn btn-g btn-s" href="#/rota">Ver a rota completa</a></div>${spot(m, nm)}</section>` : ''}
   <section class="sec"><div class="sec-h"><div><span class="eyebrow-s">rota vice city</span><h2 class="h2">Seu nível de procurado</h2><p>Cada missão concluída acende uma das 6 estrelas.</p></div></div>${track(st, nm)}</section>
@@ -434,11 +438,25 @@ const GUIA = [
   ['Quantos posts por dia e em que horário?', `<p>O <a href="#/plano" style="text-decoration:underline">Plano de Golpe</a> calcula para você. Em geral: 2 a 3 por dia por rede no começo, nos horários da agenda (almoço, fim de tarde e noite). Depois de 2 semanas, ajuste pelo painel de cada rede.</p>`],
   ['Quanto tempo até monetizar?', `<p>Depende da rota. Algumas pagam antes de ter muitos seguidores (campanhas de cortes, serviço para streamers, afiliados); as recompensas das plataformas pedem metas maiores. No YouTube, a partir de 1º de fevereiro de 2027 a entrada passa a pedir mais visualizações. Veja os requisitos atualizados no <a href="#/grana" style="text-decoration:underline">Mapa da Grana</a>.</p>`],
   ['Meu vídeo foi bloqueado ou recebeu reivindicação. E agora?', `<ol><li>Não apague a conta nem entre em pânico: reivindicação de música costuma só limitar o vídeo.</li><li>Evite trechos com a rádio do jogo tocando alto.</li><li>Evite spoiler da história e cenas de cinema longas.</li><li>Se repetir, troque o vídeo pela mesma categoria na Recarga.</li></ol>`],
+  ['O Estúdio Vice é obrigatório?', `<p>Não. Ele é um atalho para colocar o gancho na tela e deixar o vídeo em pé sem sair do app. Se você já usa o CapCut, pode continuar com ele. O importante é o vídeo ter a sua contribuição (veja "Por que o vídeo precisa parecer seu" acima).</p>`],
+  ['Como instalo o app no celular?', `<p>Abra a tela <a href="#/instalar" style="text-decoration:underline">Baixar o app</a>. No Android aparece o botão Instalar; no iPhone, toque em Compartilhar e em Adicionar à Tela de Início, pelo Safari.</p>`],
+  ['Posso ganhar dinheiro antes de ter muitos seguidores?', `<p>Sim. Revendendo o Canal Vice City com o seu link de afiliado (50% por venda), vendendo cortes para streamers ou entrando em campanhas de cortes. Veja <a href="#/revenda" style="text-decoration:underline">Revenda e ganhe 50%</a> e o Mapa da Grana.</p>`],
   ['O que fazer quando um vídeo bomba?', `<p>Poste mais do mesmo tipo nos dias seguintes, teste 2 ganchos novos no mesmo assunto e fixe esse vídeo no topo do perfil. É assim que o canal cresce rápido.</p>`]
 ];
 V.guia = () => `${heroX('canal', `${ic('note')} Comece aqui`, 'Guia do', 'iniciante', 'Respostas rápidas para as dúvidas de quem está postando pela primeira vez.', `<a class="btn btn-p" href="#/rota">${ic('star')}Seguir a Rota Vice City</a>`, '', 'eager')}
   <section class="sec"><div class="sec-h"><div><span class="eyebrow-s">o ciclo de todo dia</span><h2 class="h2">Do app para o post em 3 passos</h2></div></div>
   <div class="steps3"><div><span class="n">1</span><span><b>Escolha e baixe</b><span>Pegue o vídeo do dia na agenda ou na Recarga.</span></span></div><div><span class="n">2</span><span><b>Transforme</b><span>Gancho na tela e legenda própria. Leva 1 minuto.</span></span></div><div><span class="n">3</span><span><b>Poste e marque</b><span>Publique no horário e marque como postado aqui.</span></span></div></div></section>
+  <section class="card glow sec rv" id="original"><span class="kick">${ic('shield')} Leia antes de postar</span><h2 class="h2" style="margin-top:12px">Por que o vídeo precisa parecer seu</h2>
+    <p class="mut" style="margin-top:8px">YouTube, TikTok e Instagram olham se o vídeo é igual a outros que já existem. Vídeo repostado sem nenhuma mudança <b style="color:#fff">não entra na monetização</b> (no YouTube isso se chama conteúdo reutilizado) e costuma ser mostrado para menos gente. Quando você coloca a sua contribuição, a plataforma passa a tratar como conteúdo seu.</p>
+    <div class="grid2" style="margin-top:14px">
+      <div class="statc"><b style="font-size:17px">O que conta como contribuição</b><span>Gancho escrito na tela, legenda própria, título que explica o momento, narração com a sua voz, sua reação no canto, cortes e zoom no momento principal.</span></div>
+      <div class="statc"><b style="font-size:17px">O que não conta</b><span>Só trocar o nome do arquivo, só colocar música, só acelerar o vídeo ou postar igual a outro perfil.</span></div>
+    </div>
+    <h3 class="h3" style="margin-top:18px;font-size:19px">3 jeitos de transformar (escolha um)</h3>
+    <div class="steps3" style="margin-top:10px"><div><span class="n">1</span><span><b>CapCut (grátis)</b><span>Abra o vídeo, toque em Texto, cole o gancho do Kit Remix no topo e exporte. Leva 1 minuto.</span></span></div><div><span class="n">2</span><span><b>Estúdio Vice</b><span>Faz a mesma coisa aqui dentro do app, sem instalar nada. É opcional: um atalho para quem não quer usar outro aplicativo.</span></span></div><div><span class="n">3</span><span><b>Sua voz ou seu rosto</b><span>Narrar por cima ou reagir no canto é o que mais deixa o vídeo seu. Ideal para quem quer monetizar no YouTube.</span></span></div></div>
+    <p class="note">Nenhuma plataforma publica uma regra exata. Quanto mais da sua contribuição o vídeo tiver, mais seguro ele fica. As regras de cada programa estão no Mapa da Grana.</p></section>
+  <section class="sec"><div class="sec-h"><div><span class="eyebrow-s">mapa do app</span><h2 class="h2">O que cada parte faz (e o que é obrigatório)</h2><p>Obrigatório: faça para o canal funcionar. Recomendado: acelera. Opcional: use se quiser.</p></div></div>
+  <div class="mapa">${[['hoje', 'Postar hoje', '#/hoje'], ['plano', 'Plano de Golpe', '#/plano'], ['canal', 'Canal do Zero', '#/canal'], ['agenda', 'Gerador Agenda Vice', '#/agenda'], ['recarga', 'Recarga Vice City', '#/recarga'], ['grana', 'Mapa da Grana', '#/grana'], ['remix', 'Kit Remix', '#/remix'], ['ineditos', 'Cortes Inéditos', '#/ineditos'], ['biblioteca', 'Biblioteca', '#/biblioteca'], ['imagens', 'Imagens', '#/imagens'], ['ferramentas', 'Ferramentas', '#/ferramentas'], ['estrutura', 'Código do Dinheiro', '#/estrutura'], ['revenda', 'Revenda e ganhe 50%', '#/revenda'], ['estudio', 'Estúdio Vice', '#/estudio'], ['piloto', 'Piloto Automático', '#/extra/piloto'], ['capas', 'Kit Capas', '#/extra/capas'], ['carrossel', 'Pack Carrossel', '#/extra/carrossel'], ['clube', 'Clube Recarga Vice', '#/extra/clube']].map(([k, n, h]) => { const e = EXPLICA[k]; const cor = e[1] === 'Obrigatório' ? 'var(--pink)' : e[1] === 'Recomendado' ? 'var(--gold)' : 'var(--aqua)'; return `<a href="${h}" class="mp"><div class="row"><b>${n}</b><span class="sp"></span><span class="pill" style="color:${cor}">${e[1]}</span></div><span>${e[0]}</span></a>`; }).join('')}</div></section>
   <section class="sec"><div class="sec-h"><div><span class="eyebrow-s">dúvidas frequentes</span><h2 class="h2">Perguntas de quem está começando</h2></div></div>
   <div class="faq">${GUIA.map(([q, a], i) => `<details class="rv" ${i < 1 ? 'open' : ''}><summary>${esc(q)}</summary><div class="fa">${a}</div></details>`).join('')}</div></section>
   <section class="card glow sec rv" style="display:flex;gap:16px;align-items:center;flex-wrap:wrap"><div style="flex:1;min-width:220px"><h3 class="h3">Ainda ficou com dúvida?</h3><p class="mut" style="margin-top:6px">Fale com o nosso suporte no WhatsApp.</p></div><a class="btn btn-g" href="${CFG.SUPORTE_WHATSAPP}" target="_blank" rel="noopener">${ic('chat')}Chamar no WhatsApp</a></section>`;
@@ -876,6 +894,72 @@ function autoPost(ag) {
 }
 function baixar(txt, nome, tipo) { const u = URL.createObjectURL(new Blob([txt], { type: tipo + ';charset=utf-8' })); const a = document.createElement('a'); a.href = u; a.download = nome; a.click(); setTimeout(() => URL.revokeObjectURL(u), 1500); }
 
+/* ---------- Explicações de cada tela ---------- */
+const EXPLICA = {
+  hoje: ['Mostra exatamente o que postar hoje: o vídeo, a rede e o horário.', 'Obrigatório', 'Todo dia', ['Abra esta tela uma vez por dia', 'Baixe cada vídeo e cole o gancho e a legenda', 'Poste no horário e toque em Marcar feito']],
+  recarga: ['É o seu estoque de vídeos de GTA 6, separado por tema e com lote novo toda semana.', 'Obrigatório', 'Sempre que precisar de vídeo', ['Escolha uma categoria', 'Toque no vídeo para assistir', 'Baixe e siga os 4 passos do player']],
+  biblioteca: ['É a mesma coleção da Recarga, mas com busca e filtros para achar um vídeo específico.', 'Opcional', 'Quando quiser procurar algo', ['Digite um assunto ou escolha a categoria', 'Use "Só não postados" para não repetir', 'Toque no vídeo para baixar']],
+  ineditos: ['Cortes de streamers brasileiros feitos pelo nosso time. Quase ninguém tem, por isso costumam ter menos concorrência.', 'Recomendado', 'Misture 1 inédito por dia na sua agenda', ['Escolha o criador', 'Baixe o corte', 'Poste com o gancho e a legenda prontos']],
+  imagens: ['Imagens para manter o perfil ativo entre um vídeo e outro (stories, feed e comunidade do YouTube).', 'Opcional', 'Nos dias em que quiser postar mais', ['Escolha onde vai postar', 'Baixe a imagem', 'Copie a legenda com pergunta']],
+  agenda: ['Monta os seus 30 dias de posts: qual vídeo, em qual rede e em que horário. Tira de você o trabalho de pensar.', 'Obrigatório', 'Uma vez por mês (ou quando quiser refazer)', ['Escolha as redes e quantos posts por dia', 'Toque em Gerar meu mês', 'Depois é só seguir a tela Hoje']],
+  plano: ['Um questionário de 2 minutos que define a sua estratégia: onde postar, quanto postar e qual o caminho mais curto para ganhar dinheiro.', 'Obrigatório', 'Uma vez, no primeiro dia', ['Responda as 5 perguntas', 'Leia o seu roteiro', 'Toque em Gerar minha agenda com este plano']],
+  canal: ['Passo a passo para criar o seu canal do zero: nome, bio, logo e configuração de cada rede.', 'Obrigatório', 'No primeiro dia', ['Siga as etapas na ordem', 'Marque cada etapa concluída', 'Ao terminar, sua segunda estrela acende']],
+  remix: ['Ganchos, títulos, legendas e roteiros prontos para o seu vídeo parecer seu, e não repost.', 'Recomendado', 'Sempre que for postar', ['Escolha um gancho', 'Coloque como texto na tela', 'Use o gerador para título e legenda']],
+  ferramentas: ['Logos com IA, banner do canal, limpeza do arquivo do vídeo e atalhos para postar.', 'Opcional', 'Na criação do canal e quando precisar', ['Digite o nome do canal', 'Copie o prompt da logo', 'Cole no Gemini ou no ChatGPT']],
+  grana: ['Todas as formas reais de ganhar dinheiro com o canal, com o que cada uma exige e o passo a passo.', 'Obrigatório', 'Depois da primeira semana postando', ['Diga quantos seguidores você tem', 'Veja as rotas já abertas', 'Ative uma e marque a missão 6']],
+  estrutura: ['O nosso sistema de vendas, aberto para você vender um produto seu para o público do canal.', 'Opcional', 'A partir do 7º dia, com o canal rodando', ['Leia na ordem', 'Adapte a oferta ao seu público', 'Use a calculadora antes de anunciar']],
+  revenda: ['Você revende o Canal Vice City com o seu link e ganha 50% de cada venda. Dá para ganhar mesmo antes de ter muitos seguidores.', 'Opcional', 'A partir de hoje', ['Cadastre-se como afiliado', 'Pegue o seu link', 'Use os textos prontos na bio, nos stories e no direct']],
+  estudio: ['Coloca o gancho como texto na tela e deixa o vídeo em pé (9:16), direto no celular. Isso ajuda as plataformas a verem o vídeo como conteúdo seu.', 'Opcional', 'Antes de postar, se você não usa o CapCut', ['Abra o vídeo baixado', 'Escolha o trecho e o gancho', 'Toque em Gerar e salve na galeria']],
+  piloto: ['Deixa o canal rodando quase sozinho: agenda o mês de uma vez e transforma lives em cortes.', 'Opcional', 'Quando quiser postar sem abrir as redes todo dia', ['Comece pelo Postar sozinho', 'Use o Estúdio para os ganchos', 'Robô de Cortes para lives longas']],
+  capas: ['Capas que fazem o vídeo ser clicado no perfil, geradas por IA com o seu texto.', 'Opcional', 'Para os vídeos que você mais quer destacar', ['Escolha um estilo', 'Escreva o texto da capa', 'Copie o prompt e cole no Gemini']],
+  carrossel: ['Carrosséis prontos para o feed do Instagram, o formato que mais gera salvamento.', 'Opcional', '3 vezes por semana, além dos vídeos', ['Escolha um carrossel', 'Baixe as 5 imagens', 'Poste juntas com a legenda pronta']],
+  clube: ['Mantém a recarga de vídeos depois das 12 semanas e adiciona cortes inéditos extras todo mês.', 'Opcional', 'Para quem quer conteúdo novo sem parar', ['Assine pelo botão', 'Os vídeos extras aparecem na Recarga', 'Cancele quando quiser']]
+};
+function explica(k) {
+  const e = EXPLICA[k]; if (!e) return '';
+  const cor = e[1] === 'Obrigatório' ? 'var(--pink)' : e[1] === 'Recomendado' ? 'var(--gold)' : 'var(--aqua)';
+  return `<section class="expl"><div><small>Para que serve</small><p>${e[0]}</p></div><div><small>Preciso usar?</small><p><b style="color:${cor}">${e[1]}</b> · ${e[2]}</p></div><div><small>Como usar</small><ol>${e[3].map(x => `<li>${x}</li>`).join('')}</ol></div></section>`;
+}
+
+/* ---------- Baixar o app ---------- */
+V.instalar = () => {
+  const ios = isIOS(), and = /android/i.test(navigator.userAgent), ok = isStandalone();
+  const url = location.origin + '/app/';
+  const passosIOS = `<div class="inst"><div class="ist"><span class="n">1</span><div><b>Abra este link no Safari</b><p>O iPhone só instala apps pelo Safari (a bússola azul). Se você abriu pelo Instagram ou WhatsApp, toque nos 3 pontinhos e em "Abrir no navegador".</p></div></div>
+    <div class="ist"><span class="n">2</span><div><b>Toque no botão Compartilhar</b><p>É o quadrado com uma seta para cima, na barra de baixo da tela (no iPad fica em cima).</p><span class="ibx">${ic('down')} Compartilhar</span></div></div>
+    <div class="ist"><span class="n">3</span><div><b>Toque em "Adicionar à Tela de Início"</b><p>Role a lista para baixo até achar essa opção. Depois toque em Adicionar, no canto de cima.</p><span class="ibx">＋ Adicionar à Tela de Início</span></div></div>
+    <div class="ist"><span class="n">4</span><div><b>Pronto</b><p>O ícone do Canal Vice City aparece na sua tela inicial. Abra sempre por ele: fica em tela cheia e mais rápido.</p></div></div></div>`;
+  const passosAnd = `<div class="inst"><div class="ist"><span class="n">1</span><div><b>Toque em Instalar o app</b><p>Use o botão rosa aqui embaixo e confirme em Instalar.</p></div></div>
+    <div class="ist"><span class="n">2</span><div><b>O botão não apareceu?</b><p>Abra este link no Chrome, toque nos 3 pontinhos no canto de cima e escolha "Instalar app" ou "Adicionar à tela inicial".</p><span class="ibx">⋮ Instalar app</span></div></div>
+    <div class="ist"><span class="n">3</span><div><b>Pronto</b><p>O ícone aparece junto com os seus outros aplicativos.</p></div></div></div>`;
+  return `${heroX('login', `${ic('down')} App no celular`, 'Baixe o', 'app Vice City', ok ? 'Você já está usando o app instalado. Tudo certo.' : 'Instale em 30 segundos. Sem loja de aplicativos, sem ocupar espaço, e abre direto na sua missão do dia.', ok ? '' : `<button class="btn btn-p" onclick="instalarApp()" style="min-height:54px">${ic('down')}Instalar o app</button>`, '', 'eager')}
+  ${ok ? '' : `<section class="sec grid2">
+    <div class="card rv ${ios ? 'glow' : ''}"><div class="row"><h2 class="h3">iPhone</h2><span class="sp"></span>${ios ? '<span class="pill" style="color:var(--aqua)">Seu aparelho</span>' : ''}</div>${passosIOS}</div>
+    <div class="card rv ${and ? 'glow' : ''}"><div class="row"><h2 class="h3">Android</h2><span class="sp"></span>${and ? '<span class="pill" style="color:var(--aqua)">Seu aparelho</span>' : ''}</div>${passosAnd}</div>
+  </section>
+  ${!ios && !and ? `<section class="card sec rv" style="display:flex;gap:18px;align-items:center;flex-wrap:wrap"><img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&margin=8&data=${encodeURIComponent(url)}" alt="QR code do app" width="160" height="160" style="border-radius:14px;background:#fff"><div style="flex:1;min-width:220px"><h2 class="h3">Está no computador?</h2><p class="mut" style="margin-top:6px">Aponte a câmera do celular para este código, abra o link e siga os passos do seu aparelho. Entre com o mesmo e-mail.</p></div></section>` : ''}
+  <section class="card sec rv"><h3 class="h3">Perguntas rápidas</h3><div class="faq" style="margin-top:12px">
+    <details><summary>Não é da Play Store nem da App Store?</summary><div class="fa">Não precisa. Ele é instalado direto do navegador, de forma segura, e se atualiza sozinho. Você sempre tem a versão mais nova.</div></details>
+    <details><summary>Ocupa muito espaço?</summary><div class="fa">Quase nada. Os vídeos só ocupam espaço quando você baixa.</div></details>
+    <details><summary>Perco meu progresso?</summary><div class="fa">Não. Entre com o mesmo e-mail da compra e continue de onde parou.</div></details>
+  </div></section>`}`;
+};
+
+/* ---------- Revenda (afiliados) ---------- */
+V.revenda = () => {
+  const txts = [
+    ['Bio do perfil', 'Cortes de GTA 6 todo dia\nQuer o mesmo sistema que eu uso? Link aqui embaixo'],
+    ['Story', 'Estou usando um app que me entrega cortes de GTA 6 prontos, agenda do mês e legenda para cada rede. Se quiser o mesmo, o link está na bio.'],
+    ['Resposta no direct', 'Opa! Uso o Canal Vice City: vídeos prontos de GTA 6, agenda e tudo pelo celular. O link é este: [SEU LINK]. Qualquer dúvida me chama.'],
+    ['Comentário fixado', 'Todos os cortes do meu canal vêm do mesmo app. Link na bio.']
+  ];
+  return `${heroX('grana', `${ic('coin')} Bônus · Licença de revenda`, 'Revenda e', 'ganhe 50%', 'Você indica o Canal Vice City com o seu link e recebe metade de cada venda. É o jeito mais rápido de fazer o primeiro dinheiro, mesmo com poucos seguidores.', `<a class="btn btn-p" href="${CFG.AFILIADOS}" target="_blank" rel="noopener">${ic('bolt')}Pegar meu link de afiliado</a>`, '', 'eager')}
+  <section class="sec"><div class="steps3"><div><span class="n">1</span><span><b>Cadastre-se como afiliado</b><span>Toque no botão acima e entre com o seu e-mail na Lastlink.</span></span></div><div><span class="n">2</span><span><b>Copie o seu link</b><span>Cada venda feita por ele cai na sua conta, com 50% de comissão.</span></span></div><div><span class="n">3</span><span><b>Divulgue no seu canal</b><span>Use os textos prontos abaixo na bio, nos stories e no direct.</span></span></div></div></section>
+  <section class="sec"><div class="sec-h"><div><span class="eyebrow-s">copie e cole</span><h2 class="h2">Textos prontos para divulgar</h2></div></div><div class="grid2">${txts.map(([t, x]) => `<div class="prompt rv"><div class="row"><b>${t}</b><span class="sp"></span><button class="btn btn-g btn-s" data-cpr="${esc(x)}">${ic('copy')}Copiar</button></div><p style="white-space:pre-wrap">${esc(x)}</p></div>`).join('')}</div></section>
+  <section class="card sec rv"><h3 class="h3">Regras para não perder a comissão</h3><ul class="ul" style="margin-top:10px">${['Divulgue sempre o seu link próprio, nunca o link da página sem ele', 'Não prometa ganhos em dinheiro para quem comprar: fale do que o app entrega', 'Não faça spam em grupos ou no direct de quem não conhece você', 'Os pagamentos seguem as regras e os prazos da Lastlink'].map(x => `<li>${ic('check')}<span>${x}</span></li>`).join('')}</ul></section>`;
+};
+function bindRevenda() { const v = $('#view'); if (location.hash.startsWith('#/revenda')) v.addEventListener('click', e => { const b = e.target.closest('[data-cpr]'); if (b) copy(b.dataset.cpr, 'Texto copiado'); }); }
+
 /* ---------- Hoje: o que postar agora ---------- */
 V.hoje = () => {
   const ag = load('agenda', null), today = isoLocal();
@@ -906,11 +990,11 @@ function bindHoje() {
 /* ---------- Bônus (hub no celular) ---------- */
 V.bonus = () => {
   const G = [
-    ['Comece aqui', [['rota', 'plano', 'Rota Vice City', 'As 6 missões em ordem', null], ['guia', 'canal', 'Guia do iniciante', 'Dúvidas de quem está começando', null], ['plano', 'plano', 'Plano de Golpe', 'Sua estratégia em 5 perguntas', null]]],
+    ['Comece aqui', [['instalar', 'login', 'Baixar o app', 'Instale no celular em 30 segundos', null], ['rota', 'plano', 'Rota Vice City', 'As 6 missões em ordem', null], ['guia', 'canal', 'Guia do iniciante', 'Dúvidas de quem está começando', null], ['plano', 'plano', 'Plano de Golpe', 'Sua estratégia em 5 perguntas', null]]],
     ['Seus vídeos', [['recarga', 'recarga', 'Recarga Vice City', 'Lote novo toda semana', null], ['ineditos', 'ineditos', 'Cortes Inéditos', 'Só aqui, feitos pelo nosso time', 'ineditos'], ['imagens', 'imagens', 'Imagens para feed', `${fmt(S.imgs.length)} posts prontos`, null]]],
     ['Crescer o canal', [['agenda', 'agenda', 'Gerador Agenda Vice', 'Seu mês em 1 clique', 'agenda'], ['canal', 'canal', 'Canal do Zero', 'Perfil pronto em 1 hora', 'canal'], ['remix', 'remix', 'Kit Remix', `${C.totalGanchos} ganchos + gerador`, 'remix'], ['ferramentas', 'ferramentas', 'Ferramentas', 'Logos, capas e limpeza do arquivo', 'ferramentas']]],
-    ['Fazer dinheiro', [['grana', 'grana', 'Mapa da Grana', `${C.rotas.length} formas de monetizar`, 'grana'], ['estrutura', 'estrutura', 'Código do Dinheiro', 'O nosso sistema de vendas, aberto para você', 'estrutura']]],
-    ['Extras', [['extra/capas', 'capas', 'Kit Capas', 'Capas que fazem clicar', 'capas'], ['extra/carrossel', 'carrossel', 'Pack Carrossel', 'Carrosséis prontos para o feed', 'carrossel'], ['extra/piloto', 'piloto', 'Piloto Automático', 'Robô de Cortes e prompts', 'piloto_lite']]]
+    ['Fazer dinheiro', [['revenda', 'grana', 'Revenda e ganhe 50%', 'Seu link de afiliado + textos prontos', 'revenda'], ['grana', 'grana', 'Mapa da Grana', `${C.rotas.length} formas de monetizar`, 'grana'], ['estrutura', 'estrutura', 'Código do Dinheiro', 'O nosso sistema de vendas, aberto para você', 'estrutura']]],
+    ['Extras', [['estudio', 'remix', 'Estúdio Vice', 'Gancho na tela pelo celular', 'estudio'], ['extra/piloto', 'piloto', 'Piloto Automático', 'Postar sozinho e Robô de Cortes', 'piloto_lite'], ['extra/capas', 'capas', 'Kit Capas', 'Capas que fazem clicar', 'capas'], ['extra/carrossel', 'carrossel', 'Pack Carrossel', 'Carrosséis prontos para o feed', 'carrossel'], ['extra/clube', 'recarga', 'Clube Recarga Vice', 'Vídeos novos sem parar', 'clube']]]
   ];
   return `${heroX('login', `${ic('gem')} Seu arsenal`, 'Bônus e', 'extras', 'Tudo o que vem com o Canal Vice City, organizado pelo que você quer fazer agora.', '', '', 'sm eager')}
   ${G.map(([g, it]) => `<section class="sec"><div class="sec-h"><div><h2 class="h2">${g}</h2></div></div><div class="tiles">${it.map(([r, im, n, d, k]) => tile('#/' + r, im, n, d, '', !!k && !can(k))).join('')}</div></section>`).join('')}`;
@@ -931,7 +1015,7 @@ V.grana = (...a) => window.BONUS?.grana ? (can('grana') ? window.BONUS.grana(...
 V.remix = (...a) => window.BONUS?.remix ? (can('remix') ? window.BONUS.remix(...a) : lockCard('remix')) : '';
 V.ferramentas = (...a) => window.BONUS?.ferramentas ? (can('ferramentas') ? window.BONUS.ferramentas(...a) : lockCard('ferramentas')) : '';
 V.estrutura = (...a) => window.BONUS?.estrutura ? window.BONUS.estrutura(...a) : '';
-V.estudio = () => can('piloto_lite') ? window.ESTUDIO.view() : lockCard('piloto_lite', 'O Estúdio Vice faz parte do Piloto Automático: corte vertical com gancho na tela, direto no celular.', 'remix');
+V.estudio = () => can('estudio') ? window.ESTUDIO.view() : lockCard('estudio', 'Libere o Estúdio Vice para transformar seus vídeos com gancho na tela, direto no celular.', 'remix');
 V.extra = (qs, sub) => window.BONUS?.extra ? window.BONUS.extra(qs, sub) : '';
 
 /* =====================================================================
@@ -950,9 +1034,10 @@ function route(keepScroll) {
   view.innerHTML = fn(qs, sub) || '';
   $$('[data-r]').forEach(a => { const r = a.dataset.r; a.classList.toggle('on', r === name || r === path || (r === 'bonus' && ['canal', 'grana', 'remix', 'ferramentas', 'estrutura', 'plano', 'extra', 'ineditos', 'imagens', 'bonus', 'guia'].includes(name))); });
   window.__closeSide && window.__closeSide();
-  bindCards(view); bindRails(); bindLib(); bindQuiz(); bindAgenda(); bindHoje();
+  { const ek = name === 'extra' ? sub : name, h = view.querySelector('.hx'); if (EXPLICA[ek] && h) h.insertAdjacentHTML('afterend', explica(ek)); }
+  bindCards(view); bindRails(); bindLib(); bindQuiz(); bindAgenda(); bindHoje(); bindRevenda();
   window.BONUS?.bind?.(name, sub, qs);
-  if (name === 'estudio' && can('piloto_lite')) window.ESTUDIO.bind(); else window.ESTUDIO?.parar?.();
+  if (name === 'estudio' && can('estudio')) window.ESTUDIO.bind(); else window.ESTUDIO?.parar?.();
   const s2 = $('#sair2'); if (s2) s2.onclick = logout;
   if (keepScroll === true) scrollTo(0, y); else if (anchorId) setTimeout(() => document.getElementById(anchorId)?.scrollIntoView({ behavior: 'smooth' }), 80); else if (h !== lastRoute) scrollTo(0, 0);
   lastRoute = h;

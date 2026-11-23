@@ -342,3 +342,20 @@ body{min-height:100dvh;overscroll-behavior-y:none}
 }
 /* bloqueia o botão "abrir no Drive" do player embutido */
 .pv-player::after{content:"";position:absolute;top:0;right:0;width:72px;height:64px;z-index:2}
+.expl{display:grid;grid-template-columns:1.2fr .9fr 1.2fr;gap:12px;margin-top:14px;padding:16px;border-radius:18px;background:rgba(255,255,255,.035);border:1px solid var(--line2)}
+.expl small{display:block;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);margin-bottom:4px}
+.expl p{font-size:14px;line-height:1.45;color:#eee4f7}
+.expl ol{padding-left:18px;font-size:13.5px;line-height:1.5;color:#eee4f7;display:grid;gap:2px}
+@media (max-width:760px){.expl{grid-template-columns:1fr;gap:12px}}
+.mapa{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px}
+.mapa .mp{display:block;padding:14px;border-radius:16px;background:rgba(255,255,255,.035);border:1px solid var(--line)}
+.mapa .mp b{font-size:15px}.mapa .mp>span{display:block;font-size:13px;color:var(--mut);margin-top:6px;line-height:1.45}
+.inst{display:grid;gap:14px;margin-top:12px}
+.ist{display:flex;gap:12px;align-items:flex-start}
+.ist .n{width:32px;height:32px;flex:none;border-radius:50%;display:grid;place-items:center;font-family:var(--disp);background:var(--cta)}
+.ist b{display:block;font-size:15.5px}.ist p{font-size:13.5px;color:var(--mut);margin-top:4px;line-height:1.45}
+.ibx{display:inline-flex;align-items:center;gap:6px;margin-top:8px;padding:8px 12px;border-radius:10px;background:#fff;color:#111;font-weight:700;font-size:13px}
+.ibx .ic{width:16px;height:16px;transform:rotate(180deg)}
+.instb{display:flex;gap:14px;align-items:center;background:linear-gradient(100deg,rgba(255,47,179,.22),rgba(46,230,214,.08))}
+.instb img{width:52px;height:52px;border-radius:14px;flex:none;box-shadow:var(--neon)}
+.instb>span{flex:1}.instb b{display:block;font-size:16px}.instb>span>span{font-size:13px;color:var(--mut)}
