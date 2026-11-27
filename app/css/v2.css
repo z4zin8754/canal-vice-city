@@ -385,3 +385,18 @@ body{width:100%;position:relative}
   .h2{font-size:28px}
   .btn{min-height:46px}
 }
+
+/* v5 · iPhone com notch / Dynamic Island e Android com barra de gestos */
+:root{--sat:env(safe-area-inset-top,0px);--sab:env(safe-area-inset-bottom,0px)}
+.top{height:calc(var(--top) + var(--sat));padding-top:var(--sat)}
+.filters{top:calc(var(--top) + var(--sat))}
+.side{padding-top:calc(20px + var(--sat));padding-bottom:calc(20px + var(--sab))}
+.side .xclose{top:calc(14px + var(--sat))}
+.pv-top{padding-top:calc(12px + var(--sat))}
+@media (max-width:980px){
+  .modal .mhead{padding-top:calc(16px + var(--sat))}
+  .main,.view{padding-bottom:calc(96px + var(--sab))}
+  .hamb{width:46px;height:46px;flex:none}
+  .side .xclose{width:44px;height:44px}
+  a,button,.btn,.tabbar a{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+}
