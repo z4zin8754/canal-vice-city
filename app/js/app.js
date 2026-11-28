@@ -88,8 +88,9 @@ function legenda(v, plat, seed = 1) {
   const criador = m && m.cn ? m.cn : '';
   const tagCriador = criador ? '#' + criador.toLowerCase().normalize('NFD').replace(/[^a-z0-9]/g, '') : '';
   // título: o do nosso time quando existe; senão o gancho com a palavra-chave GTA 6
-  let titulo = m && m.t ? m.t : pick(C.cap.titulo[k] || C.cap.titulo.corte, r);
-  const assunto = m && m.t ? m.t : pick(C.cap.assunto[k] || C.cap.assunto.corte, r);
+  const alt = m && m.t ? [m.t, comGTA(m.h || m.t), pick(C.cap.titulo[k] || C.cap.titulo.corte, r)] : null;
+  let titulo = alt ? alt[(seed - 1) % 3] : pick(C.cap.titulo[k] || C.cap.titulo.corte, r);
+  const assunto = alt ? alt[(seed - 1) % 3] : pick(C.cap.assunto[k] || C.cap.assunto.corte, r);
   const linha = m && m.l ? m.l : '';
   const frase = (a, b) => !b ? a : (/[\p{L}\p{N}]$/u.test(a.trim()) ? a.trim() + '.' : a.trim()) + ' ' + b;
   const pergunta = pick(C.cap.pergunta[k] || C.cap.pergunta.corte, r);
@@ -371,7 +372,7 @@ function openVideo(id, plat = 'tiktok') {
           <div class="pv-copy"><div class="pv-ch"><small>Gancho para a tela</small><button class="btn btn-g btn-s" data-c="g">${ic('copy')}Copiar</button></div><p>${esc(l.gancho)}</p></div>
           <div class="pv-copy"><div class="pv-ch"><small>Título</small><button class="btn btn-g btn-s" data-c="t">${ic('copy')}Copiar</button></div><p>${esc(l.titulo)}</p></div>
           <div class="pv-copy"><div class="pv-ch"><small>Legenda + hashtags</small><button class="btn btn-g btn-s" data-c="l">${ic('copy')}Copiar</button></div><p class="pre">${esc(l.texto)}</p></div>
-          <div class="pv-acts">${v.m ? '' : `<button class="btn btn-g" data-c="n">${ic('refresh')}Outra versão</button>`}<button class="btn btn-g" data-c="ia">${ic('wand')}Legenda sob medida (IA)</button></div>
+          <div class="pv-acts"><button class="btn btn-g" data-c="n">${ic('refresh')}Gerar outra versão</button><button class="btn btn-g" data-c="ia">${ic('wand')}Legenda sob medida (IA)</button></div>
           ${v.m ? `<p class="pv-note">Texto feito pelo nosso time para este corte.${v.m.cn ? ' Mantenha os créditos do streamer: ajuda a evitar denúncia e mostra respeito ao criador.' : ''}</p>` : `<p class="pv-note">Não gostou? Toque em Outra versão. Para um texto sobre exatamente o que acontece no vídeo, use Legenda sob medida: copia um comando pronto para colar no ChatGPT ou no Gemini.</p>`}
           <div class="pv-step"><span class="n">4</span><div><b>Postou? Marque aqui</b><span>Assim a agenda e a sua rota avançam.</span></div></div>
           <div class="pv-acts"><button class="btn ${done ? 'btn-g' : 'btn-p'}" data-m="post">${ic('check')}${done ? 'Postado' : 'Marcar como postado'}</button><button class="btn btn-g" data-m="fav">${STAR}${fav ? 'Salvo' : 'Salvar'}</button></div>
