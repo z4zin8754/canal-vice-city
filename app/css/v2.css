@@ -400,3 +400,7 @@ body{width:100%;position:relative}
   .side .xclose{width:44px;height:44px}
   a,button,.btn,.tabbar a{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 }
+
+/* v6 · acentos (Á, Ê, Ã) não cortados nos títulos em Anton */
+.chrome,.brush,.hx .t1,.hx .t2{padding-top:.14em;margin-top:-.1em}
+.vc .cvt{line-height:1.18;padding-top:.1em}

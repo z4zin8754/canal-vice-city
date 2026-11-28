@@ -1,5 +1,5 @@
 /* Canal Vice City · service worker */
-const V = 'cvc-v16';
+const V = 'cvc-v17';
 const SHELL = ['./', 'index.html', 'css/app.css', 'css/v2.css', 'js/config.js', 'js/content.js', 'js/app.js', 'js/bonus.js', 'js/estudio.js', 'assets/sprite.svg', 'assets/logo.webp', 'assets/logo-96.webp', 'assets/img/login.webp', 'assets/img/qg.webp', 'data/catalog.json'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(V).then(c => c.addAll(SHELL.map(u => new Request(u, { cache: 'reload' }))).catch(() => {})).then(() => self.skipWaiting())); });
 self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== V).map(k => caches.delete(k)))).then(() => self.clients.claim())); });
