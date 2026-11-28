@@ -421,3 +421,16 @@ html,body{overflow-x:hidden;max-width:100%;overscroll-behavior-x:none}
   .view,.main{overflow-x:hidden}
   img,iframe,video{max-width:100%}
 }
+
+/* v8 · trava definitiva do eixo horizontal no celular */
+html{touch-action:pan-y}
+html,body{width:100%;max-width:100%;overflow-x:hidden;overscroll-behavior:none;position:relative}
+.shell,.main,.view{max-width:100%;overflow-x:clip}
+@media (max-width:980px){
+  .side:not(.open){visibility:hidden;transition:transform .3s cubic-bezier(.2,.8,.2,1),visibility 0s .3s}
+  .side.open{visibility:visible;transition:transform .3s cubic-bezier(.2,.8,.2,1)}
+  .chips,.filters .chips,.toc{flex-wrap:wrap;overflow:visible}
+  .pv-copy p.pre,.capc .cp-prompt{white-space:pre-wrap;word-break:break-word;overflow-x:hidden;touch-action:pan-y}
+  #view img,#view video,#view iframe,#view table{max-width:100%}
+  #view *{overflow-wrap:anywhere}
+}

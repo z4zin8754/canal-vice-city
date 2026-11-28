@@ -1197,3 +1197,12 @@ window.instalarApp = instalarApp;
 window.CVCAPP = { load, save, can, ic, esc, copy, toast, openModal, closeModal, thumb, dl, lockCard, starsHtml, refreshStars, route, reveal, S };
 boot().catch(e => { console.error(e); document.body.innerHTML = '<p style="padding:40px;font-family:sans-serif;color:#fff">Não foi possível carregar o app. Atualize a página.</p>'; });
 })();
+
+/* trava o eixo X: se algo empurrar a página para o lado, volta na hora */
+(() => {
+  const fix = () => { if (scrollX !== 0) scrollTo(0, scrollY); const se = document.scrollingElement; if (se && se.scrollLeft) se.scrollLeft = 0; if (document.body.scrollLeft) document.body.scrollLeft = 0; };
+  addEventListener('scroll', fix, { passive: true });
+  addEventListener('touchend', fix, { passive: true });
+  addEventListener('resize', fix);
+  document.addEventListener('gesturestart', e => e.preventDefault());
+})();
