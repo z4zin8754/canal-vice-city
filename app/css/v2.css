@@ -404,3 +404,20 @@ body{width:100%;position:relative}
 /* v6 · acentos (Á, Ê, Ã) não cortados nos títulos em Anton */
 .chrome,.brush,.hx .t1,.hx .t2{padding-top:.14em;margin-top:-.1em}
 .vc .cvt{line-height:1.18;padding-top:.1em}
+
+/* v7 · celular sem nada arrastando para o lado */
+html,body{overflow-x:hidden;max-width:100%;overscroll-behavior-x:none}
+@media (max-width:980px){
+  /* trilhos viram grade vertical: nada rola na horizontal sem querer */
+  .rail-track{display:grid;grid-auto-flow:row;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-columns:auto;overflow:visible;scroll-snap-type:none;padding-bottom:0}
+  .rail-track>.vc:nth-child(n+7){display:none}
+  .rail-btn{display:none!important}
+  /* chips em várias linhas em vez de rolar de lado */
+  .chips,.filters .chips{flex-wrap:wrap;overflow:visible}
+  /* sem efeitos pesados que fazem a tela tremer na rolagem */
+  *{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+  .rv,.rv.in{opacity:1!important;transform:none!important;transition:none!important}
+  .hx .bg{transform:none!important}
+  .view,.main{overflow-x:hidden}
+  img,iframe,video{max-width:100%}
+}
