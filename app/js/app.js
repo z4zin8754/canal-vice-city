@@ -340,12 +340,7 @@ function vcard(v) {
       <button class="btn btn-g ib" data-post="${v.id}" title="Marcar como postado">${ic('check')}</button></div></div>
   </article>`;
 }
-function capaTxt(v) {
-  if (v.cat === 'ineditos') return v.raw;
-  if (v.cat === 'novos') return C.temas[v.tema] || 'Novo';
-  const g = C.ganchos[C.ganchosPorCat[v.cat] || 'corte'];
-  return g[hash(v.id) % g.length].replace(/[.?!]+$/, '');
-}
+function capaTxt(v) { if (v.m && v.m.h) return v.m.h; if (v.cat === 'ineditos') return v.raw; if (v.cat === 'novos') return C.temas[v.tema] || ''; return ''; }
 function bindCards(root = document) {
   root.onclick = e => {
     const t = e.target.closest('[data-open],[data-fav],[data-copy],[data-post]');
