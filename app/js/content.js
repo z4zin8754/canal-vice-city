@@ -297,5 +297,48 @@ C.mensagens = [
   { titulo: 'Follow-up depois de 3 dias', t: 'Fala, [nome]! Passando para saber se você viu o corte que te mandei. Consigo te entregar os 5 primeiros esta semana para você testar.' }
 ];
 
+
+/* ---------- v2 · Legendas de verdade (por rede, por categoria, com SEO) ---------- */
+C.cap = {
+  // primeira linha da legenda: assunto + palavra-chave (o Instagram, TikTok e YouTube buscam por texto)
+  assunto: {
+    curiosidade: ['Detalhe do GTA 6 que passou batido por muita gente', 'Mais um detalhe absurdo de Vice City no GTA 6', 'Coisa do GTA 6 que quase ninguém reparou', 'O nível de detalhe do GTA 6 nessa cena', 'Curiosidade do GTA 6 que vale a pena ver de perto'],
+    meme: ['Todo jogador de GTA 6 já passou por isso', 'Vice City não perdoa ninguém', 'O GTA 6 sendo o GTA 6 de sempre', 'Isso só acontece no GTA 6', 'O caos de Vice City em poucos segundos'],
+    corte: ['Momento insano no GTA 6', 'Isso aconteceu numa gameplay de GTA 6', 'Ninguém esperava esse final no GTA 6', 'O tipo de coisa que só acontece no GTA 6', 'Gameplay de GTA 6 que terminou do jeito mais inesperado'],
+    teoria: ['Teoria sobre o GTA 6 que faz sentido', 'Pista escondida no GTA 6', 'O que a Rockstar pode estar escondendo no GTA 6', 'Teoria de GTA 6 pra você pensar', 'Detalhe do GTA 6 que pode mudar a história'],
+    react: ['Reação ao vivo jogando GTA 6', 'A reação de quem jogou GTA 6 pela primeira vez', 'Ninguém segura a reação nesse momento do GTA 6', 'Reação sincera ao GTA 6', 'O momento em que a live parou no GTA 6'],
+    noticia: ['Novidade do GTA 6 que você precisa saber', 'O que mudou no GTA 6', 'Notícia de GTA 6 resumida em segundos', 'GTA 6: o que está rolando agora', 'Informação de GTA 6 que todo jogador vai querer saber'],
+    comparacao: ['GTA 5 contra GTA 6 lado a lado', 'A evolução do GTA 5 para o GTA 6', 'Comparação GTA 5 x GTA 6 que impressiona', '13 anos de diferença entre GTA 5 e GTA 6', 'O mesmo detalhe no GTA 5 e no GTA 6']
+  },
+  // títulos prontos (com GTA 6 escrito, até ~60 caracteres)
+  titulo: {
+    curiosidade: ['Detalhe do GTA 6 que quase ninguém viu', 'A Rockstar escondeu isso no GTA 6', 'O nível de detalhe do GTA 6 é absurdo', 'Você reparou nisso no GTA 6?', 'Mais um segredo de Vice City no GTA 6'],
+    meme: ['Todo mundo já fez isso no GTA 6', 'GTA 6 sendo GTA 6', 'Vice City não perdoa ninguém', 'Quando o plano dá errado no GTA 6', 'A física do GTA 6 escolheu o caos'],
+    corte: ['Ninguém esperava esse final no GTA 6', 'Isso aconteceu de verdade no GTA 6', 'O momento mais insano do GTA 6', 'Deu tudo errado no GTA 6', 'Espera o final desse momento no GTA 6'],
+    teoria: ['Teoria do GTA 6 que faz muito sentido', 'A pista que a Rockstar deixou no GTA 6', 'O GTA 6 pode estar escondendo isso', 'Essa teoria muda a história do GTA 6'],
+    react: ['A reação mais sincera ao GTA 6', 'Ninguém estava pronto pra isso no GTA 6', 'A live parou nesse momento do GTA 6', 'Ele não acreditou no que viu no GTA 6'],
+    noticia: ['Novidade do GTA 6 que você precisa saber', 'O que mudou no GTA 6', 'GTA 6: a notícia do dia em segundos', 'A Rockstar mudou isso no GTA 6'],
+    comparacao: ['GTA 5 x GTA 6: olha a diferença', '13 anos de evolução do GTA 5 pro GTA 6', 'O mesmo detalhe no GTA 5 e no GTA 6', 'GTA 6 deixou o GTA 5 pra trás nisso']
+  },
+  // pergunta que puxa comentário (comentário é o sinal que mais empurra o vídeo)
+  pergunta: {
+    curiosidade: ['Você já tinha reparado nisso?', 'Qual detalhe do GTA 6 mais te impressionou até agora?', 'Conta um detalhe que você achou e ninguém fala.', 'Você viu isso jogando ou só agora?'],
+    meme: ['Quem nunca? Confessa nos comentários.', 'Marca o amigo que faz exatamente isso.', 'Você faria igual ou diferente?', 'Qual foi o seu pior momento no GTA 6?'],
+    corte: ['O que você faria no lugar dele?', 'Nota de 0 a 10 pra esse momento?', 'Você esperava esse final?', 'Assistiu até o fim? Comenta o que achou.'],
+    teoria: ['Você acredita nessa teoria?', 'Faz sentido ou é viagem? Comenta.', 'Qual teoria do GTA 6 você defende?', 'Sabe de mais alguma pista? Escreve aqui.'],
+    react: ['Você reagiu igual?', 'Qual foi a sua reação quando viu isso?', 'Melhor reação do GTA 6 até agora?', 'Você estaria assim também?'],
+    noticia: ['Gostou ou não gostou dessa novidade?', 'Isso muda alguma coisa pra você?', 'O que você espera do próximo update?', 'Concorda com essa decisão da Rockstar?'],
+    comparacao: ['Qual ficou melhor pra você?', 'GTA 5 ou GTA 6: qual você escolhe?', 'A diferença foi maior do que você esperava?', 'O que mais evoluiu na sua opinião?']
+  },
+  // convite para seguir (fica depois da pergunta)
+  seguir: ['Segue o canal pra ver o melhor de Vice City todo dia.', 'Segue pra não perder o próximo corte de GTA 6.', 'Todo dia tem GTA 6 novo aqui. Segue pra acompanhar.', 'Ativa o sininho que amanhã tem mais GTA 6.'],
+  // hashtags enxutas: 3 a 5 por post rendem mais que 30
+  tags: {
+    curiosidade: ['#curiosidadesgta6', '#detalhesgta6'], meme: ['#memesgta', '#gtamemes'], corte: ['#cortesgta6', '#gta6gameplay'],
+    teoria: ['#teoriasgta6', '#rockstargames'], react: ['#reactgta6', '#streamer'], noticia: ['#noticiasgta6', '#gta6news'], comparacao: ['#gta5vsgta6', '#rockstargames']
+  },
+  tagsRede: { tiktok: ['#fyp'], reels: [], shorts: ['#shorts'], kwai: ['#kwai'], facebook: [] }
+};
+
 window.CONTENT = C;
 })();

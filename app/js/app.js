@@ -78,14 +78,45 @@ function pretty(v) {
 }
 
 /* ---------- Legendas ---------- */
-function ganchoPara(v, r) { const g = C.ganchos[C.ganchosPorCat[v.cat] || 'corte']; return pick(g, r); }
+function ganchoPara(v, r) { if (v.m && v.m.h) return v.m.h; const g = C.ganchos[C.ganchosPorCat[v.cat] || 'corte']; return pick(g, r); }
+const comGTA = s => /gta/i.test(s) ? s : s.replace(/[.!?]*$/, '') + ' no GTA 6';
 function legenda(v, plat, seed = 1) {
-  const r = rng(hash(v.id + plat) + seed);
+  const r = rng(hash(v.id + plat) + seed * 7919);
+  const k = C.ganchosPorCat[v.cat] || 'corte';
   const g = ganchoPara(v, r);
-  const cta = pick(C.ctas, r);
-  const tags = [...C.tagsBase, ...(C.tagsCat[v.cat] || []), ...(C.tagsPlat[plat] || [])];
-  const tit = pick(C.titulos, r).replace('{g}', g);
-  return { titulo: tit, gancho: g, texto: `${g}\n\n${cta}\n\n${tags.join(' ')}`, tags: tags.join(' ') };
+  const m = v.m || null;
+  const criador = m && m.cn ? m.cn : '';
+  const tagCriador = criador ? '#' + criador.toLowerCase().normalize('NFD').replace(/[^a-z0-9]/g, '') : '';
+  // título: o do nosso time quando existe; senão o gancho com a palavra-chave GTA 6
+  let titulo = m && m.t ? m.t : pick(C.cap.titulo[k] || C.cap.titulo.corte, r);
+  const assunto = m && m.t ? m.t : pick(C.cap.assunto[k] || C.cap.assunto.corte, r);
+  const linha = m && m.l ? m.l : '';
+  const frase = (a, b) => !b ? a : (/[\p{L}\p{N}]$/u.test(a.trim()) ? a.trim() + '.' : a.trim()) + ' ' + b;
+  const pergunta = pick(C.cap.pergunta[k] || C.cap.pergunta.corte, r);
+  const seguir = pick(C.cap.seguir, r);
+  const credito = criador ? `Créditos: ${criador}${m.ch ? ' ' + m.ch : ''}` : '';
+  const tags = [...new Set(['#gta6', '#gtavi', '#vicecity', ...(C.cap.tags[k] || []), ...(tagCriador ? [tagCriador] : []), ...(C.cap.tagsRede[plat] || [])])].slice(0, 6);
+  let texto;
+  if (plat === 'shorts') {
+    titulo = (titulo.length > 88 ? titulo.slice(0, 85) + '...' : titulo) + ' #shorts';
+    texto = [frase(assunto, linha), pergunta, seguir, credito, tags.join(' ')].filter(Boolean).join('\n\n');
+  } else if (plat === 'tiktok') {
+    texto = [frase(frase(assunto, linha), pergunta), credito, tags.join(' ')].filter(Boolean).join('\n\n');
+  } else {
+    texto = [assunto, [linha, pergunta].filter(Boolean).join(' '), seguir, credito, tags.join(' ')].filter(Boolean).join('\n\n');
+  }
+  return { titulo, gancho: g, texto, tags: tags.join(' ') };
+}
+function promptIA(v, plat) {
+  const k = C.ganchosPorCat[v.cat] || 'corte';
+  return `Você é especialista em vídeos curtos de GTA 6 para ${C.plats[plat].nome}. Vou postar um corte de GTA 6 (categoria: ${k}${v.m && v.m.cn ? ', streamer: ' + v.m.cn : ''}). O que acontece no vídeo: [DESCREVA EM 1 FRASE O QUE ACONTECE].
+
+Me entregue, em português do Brasil e com linguagem de quem joga:
+1. 5 ganchos de até 8 palavras para escrever na tela nos 3 primeiros segundos, cada um com um ângulo diferente (curiosidade, humor, choque, pergunta, desafio).
+2. 3 títulos com "GTA 6" escrito, até 70 caracteres.
+3. 1 legenda pronta: primeira linha com a palavra-chave GTA 6 e o assunto, uma frase sobre o momento, uma pergunta que faça a pessoa comentar e um convite para seguir.
+4. 5 hashtags (3 amplas e 2 de nicho), sem repetir as óbvias.
+Sem prometer nada falso sobre o vídeo e sem spoiler da história do jogo.`;
 }
 
 /* ---------- Ícone/marca ---------- */
@@ -328,9 +359,9 @@ function bindCards(root = document) {
 function openVideo(id, plat = 'tiktok') {
   const v = S.byId[id]; if (!v) return;
   const cat = C.cats[v.cat];
-  let p = plat;
+  let p = plat, seedv = 1;
   const sheet = () => {
-    const l = legenda(v, p), done = sets.posted().has(id), fav = sets.fav().has(id);
+    const l = legenda(v, p, seedv), done = sets.posted().has(id), fav = sets.fav().has(id);
     return `<div class="pv">
       <div class="pv-top"><button class="pv-back" data-x aria-label="Fechar">${ic('x')}</button><div class="pv-tt"><span style="color:${cat.cor}">${esc(cat.curto)}</span><b>${esc(v.title)}</b></div></div>
       <div class="pv-grid">
@@ -345,6 +376,8 @@ function openVideo(id, plat = 'tiktok') {
           <div class="pv-copy"><div class="pv-ch"><small>Gancho para a tela</small><button class="btn btn-g btn-s" data-c="g">${ic('copy')}Copiar</button></div><p>${esc(l.gancho)}</p></div>
           <div class="pv-copy"><div class="pv-ch"><small>Título</small><button class="btn btn-g btn-s" data-c="t">${ic('copy')}Copiar</button></div><p>${esc(l.titulo)}</p></div>
           <div class="pv-copy"><div class="pv-ch"><small>Legenda + hashtags</small><button class="btn btn-g btn-s" data-c="l">${ic('copy')}Copiar</button></div><p class="pre">${esc(l.texto)}</p></div>
+          <div class="pv-acts">${v.m ? '' : `<button class="btn btn-g" data-c="n">${ic('refresh')}Outra versão</button>`}<button class="btn btn-g" data-c="ia">${ic('wand')}Legenda sob medida (IA)</button></div>
+          ${v.m ? `<p class="pv-note">Texto feito pelo nosso time para este corte.${v.m.cn ? ' Mantenha os créditos do streamer: ajuda a evitar denúncia e mostra respeito ao criador.' : ''}</p>` : `<p class="pv-note">Não gostou? Toque em Outra versão. Para um texto sobre exatamente o que acontece no vídeo, use Legenda sob medida: copia um comando pronto para colar no ChatGPT ou no Gemini.</p>`}
           <div class="pv-step"><span class="n">4</span><div><b>Postou? Marque aqui</b><span>Assim a agenda e a sua rota avançam.</span></div></div>
           <div class="pv-acts"><button class="btn ${done ? 'btn-g' : 'btn-p'}" data-m="post">${ic('check')}${done ? 'Postado' : 'Marcar como postado'}</button><button class="btn btn-g" data-m="fav">${STAR}${fav ? 'Salvo' : 'Salvar'}</button></div>
           <p class="pv-note">${C.plats[p].tamanho}.</p>
@@ -359,7 +392,9 @@ function openVideo(id, plat = 'tiktok') {
     const b = e.target.closest('button,[data-dl]'); if (!b) return;
     if (b.dataset.x !== undefined) return closeModal();
     if (b.dataset.dl !== undefined) return toast('Baixando o vídeo. Ele aparece em Downloads ou na galeria.');
-    const l = legenda(v, p);
+    const l = legenda(v, p, seedv);
+    if (b.dataset.c === 'n') { seedv++; return rerenderSide(); }
+    if (b.dataset.c === 'ia') return copy(promptIA(v, p), 'Comando copiado. Cole no ChatGPT ou no Gemini e descreva o vídeo.');
     if (b.dataset.plat) { p = b.dataset.plat; return rerenderSide(); }
     if (b.dataset.c === 'g') return copy(l.gancho, 'Gancho copiado');
     if (b.dataset.c === 't') return copy(l.titulo, 'Título copiado');
@@ -1068,7 +1103,7 @@ async function loadData() {
   const [sp, cat] = await Promise.all([fetch('assets/sprite.svg').then(r => r.text()), fetch('data/catalog.json').then(r => r.json())]);
   SPRITE = sp;
   const fold = s => s.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
-  S.vids = cat.videos.map(([id, c, raw, mb, tema, st]) => ({ id, cat: c, raw, mb, tema, start: !!st }));
+  S.vids = cat.videos.map(([id, c, raw, mb, tema, st, m]) => ({ id, cat: c, raw, mb, tema, start: !!st, m }));
   S.vids.forEach(v => { v.title = pretty(v); v.search = fold(v.title + ' ' + v.raw + ' ' + C.cats[v.cat].nome + ' ' + (C.temas[v.tema] || '')); S.byId[v.id] = v; });
   S.imgs = cat.imagens; S.extras = cat.extras;
   window.CVCDATA = S;
